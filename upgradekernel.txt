@@ -1,0 +1,13 @@
+openSUSE:/home/arif # zypper in --from Kernel:stable kernel-desktop
+Loading repository data...
+Reading installed packages...
+Resolving package dependencies...
+
+The following NEW packages are going to be installed:
+  kernel-desktop kernel-desktop ndiswrapper-kmp-desktop 
+  vmware-guest-kmp-desktop 
+
+4 new packages to install.
+Overall download size: 77.6 MiB. After the operation, additional 237.8 MiB will 
+be used.
+Continue? [y/n/?] (y): y

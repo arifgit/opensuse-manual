@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="tuning_cgroups.xml" id="cha.tuning.cgroups">
+ <title>Kernel Control Groups</title>
+ <title>Grup Kontrol Kernel</title>
+
+ <abstract>
+  <para>
+      Grup Kontrol Kernel (selanjutnya disebut <quote>cgroups</quote>) merupakan
+      sebuah fitur dari kernel yang memperbolehkan menambah atau membagi tugas (proses)
+      dan semua anak prosesnya kepada grup yang terorganisasi secara hierarkis. Grup 
+      Hierarki ini dapat dikonfigurasi untuk memperlihatkan perilaku khusus yang membantu
+      pengaturan sistem untuk pemanfaatan optimal dari perangkat keras dan jaringan yang
+      tersedia.
+  </para>
+ </abstract>
+ <sect1 id="sec.tuning.cgroups.overview">
+
+
+
+
+  <title>Pandangan Teknis Sekilas dan Definisi</title>
+
+  <para>
+   Berikut ini adalah istilah yang digunakan pada bab ini:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     <quote>cgroup</quote> merupakan nama lain Kontrol Grup.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Dalam sebuah cgroup, ada beberapa set tugas (proses) yang dihubungkan dengan
+     sebuah set subsistem yang berperan sebagai parameter yang merupakan lingkungan
+     dari tugas.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     SubSystem menyediakan parameter yang dapat ditugasi dan menentukan aturan CPU,
+     "freezer", atau-yang lebih umum-<quote>resource controller</quote>
+     untuk memory, I/O diska, dan lain lain.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     cgroup diorganisasi dalam hierarki berbentuk pohon. Bisa juga terdapat
+     lebih dari satu hierarki pada sistem. Anda dapat menggunakan hierarki yang lain
+     atau alternatif lain untuk menghadapai situasi spesifik.
+    </para>
+   </listitem>
+   <listitem>
+
+    <para>
+     Tiap tugas yang berjalan pada sistem merupakan satu bagian dari cgroup pada
+     hierarki.
+    </para>
+   </listitem>
+
+  </itemizedlist>
+ </sect1>
+ <sect1 id="sec.tuning.cgroups.scenario">
+  <title>Skenario</title>
+
+  <para>
+   Lihat pada skenario perencanaan sumberdaya berikut untuk pemahaman yang lebih baik
+   (source:
+   <filename>/usr/src/linux/Documentation/cgroups/cgroups.txt</filename>):
+  </para>
+
+  <figure id="fig.tuning.cgroups.scenario1">
+   <title>Perencanaan Sumber Daya</title>
+   <mediaobject>
+    <imageobject role="html">
+     <imagedata fileref="cgroups1.png" width="75%" format="PNG"/>
+    </imageobject>
+    <imageobject role="fo">
+     <imagedata fileref="cgroups1.svg" width="75%" format="SVG"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   Peramban Web seperti Firefox akan menjadi bagian dari kelas Jaringan Web, sedangkan
+   daemon (jurig) seperti (k)nfsd akan menjadi bagian dari kelas Jaringan NFS.
+   Di sisi lain, Firefox akan berbagi kelas CPU dan memori yang layak tergantung
+   bagaimana seorang professor atau siswa memulainya.
+  </para>
+
+
+ </sect1>
+ <sect1 id="sec.tuning.cgroups.subsys">
+  <title>SubSistem Grup Kontrol</title>
+
+  <para>
+   Subsistem berikut tersedia dan dapat diklasifikasikan menjadi dua jenis:
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Isolation and Special Controllers</term>
+    <term>Isolasi dan Kontroler Khusus</term>
+    <listitem>
+     <para>
+      cpuset, freezer, divais, checkpoint/restart
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Resource Controllers</term>
+    <listitem>
+     <para>
+      cpu (penjadwal), cpuacct, memory, I/O diska, jaringan
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   Mengaitkan tiap subsistem secara terpisah:
+  </para>
+
+  <screen>mount -t cgroup -o cpu none /cpu
+mount -t cgroup -o cpuset none /cpuset
+  </screen>
+
+  <para>
+   atau semua subsistem dalam sekali jalan; anda dapat menggunakan nama divais
+   yang ditentukan (mis, <literal>none</literal>), yang akan muncul pada
+   <filename>/proc/mounts</filename>:
+  </para>
+
+  <screen>mount -t cgroup none /sys/fs/cgroup
+  </screen>
+
+  <para>
+   Beberapa informasi tambahan yang tersedia pada subsistem:
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Cpuset (Isolation)</term>
+    <listitem>
+     <para>
+      Menggunakan cpuset untuk mengaitkan proses pada sistem subset dari
+      CPU dan memori (<quote>memory nodes</quote>). sebagai contoh, lihat
+      <xref linkend="sec.tuning.cgroups.usage.ex.cpusets"/>.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Freezer (Control)</term>
+    <listitem>
+     <para>
+      Subsistem Freezer merupakan cluster komputasi performa tinggi.
+      Gunakan ini untuk mem-freeze (menghentikan) semua tugas dalam sebuah
+      grup atau menghentikan tugas tugas yang ada, jika mereka sampai
+      pada checkpoint yang sudah ditentukan. Informasi lebih lanjut, lihat
+      <filename>/usr/src/linux/Documentation/cgroups/freezer-subsystem.txt</filename>.
+     </para>
+     <para>
+      Ini merupakan perintah dasar untuk menggunakan freezer subsistem:
+     </para>
+     <screen>mount -t cgroup -o freezer freezer /freezer
+# Membuat cgroup anakan:
+mkdir /freezer/0
+# Memasukkan sebuah tugas ke cgroup ini:
+echo $task_pid &gt; /freezer/0/tasks
+# Freeze:
+echo FROZEN &gt; /freezer/0/freezer.state
+# Unfreeze:
+echo THAWED &gt; /freezer/0/freezer.state
+</screen>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Checkpoint/Restart (Control)</term>
+    <listitem>
+     <para>
+      Simpan kondisi dari semua proses dalam sebuah cgroup ke berkas dump.
+      Jalankan ulang kemudian (atau hanya simpan saja kondisi tadi dan lanjut).
+     </para>
+     <para>
+      Pindahkan sebuah <quote>saved container</quote> antara mesin fisis (sebagaimana
+      yang dapat dilakukan VM)
+     </para>
+     <para>
+      Dump semua citra proses dari sebuah cgroup ke sebuah berkas.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Divais (Isolation)</term>
+    <listitem>
+     <para>
+      Sistem administrator dapat menyediakan daftar dari berkas yang dapat
+      diakses oleh proses dibawah cgroups.
+     </para>
+
+     <para>
+      Aksesnya yang terbatas pada sebuah divais atau sistem berkas pada
+      sebuah divais pada tugas yang menjadi bagian dari cgroup spesifik.
+      Untuk informasi lebih lanjut, lihat
+      <filename>/usr/src/linux/Documentation/cgroups/devices.txt</filename>.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Cpuacct (Control)</term>
+    <listitem>
+     <para>
+      Grup tugas CPU accounting controller menggunakan cgroup dan menghitung
+      penggunakan CPU pada grup ini. Untuk informasi lebih lanjut, lihat
+      <filename>/usr/src/linux/Documentation/cgroups/cpuacct.txt</filename>.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>CPU (Resource Control)</term>
+    <listitem>
+     <para>
+      Membagi bandwidth CPU antara group dengan grup penjadwal fungsi dari CFS
+      (penjadwal). Rumitlah pokoknya.
+
+
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Memory (Resource Control)</term>
+    <listitem>
+     <itemizedlist mark="bullet" spacing="normal">
+      <listitem>
+       <para>
+        Limits memory usage of user space processes.
+        Membatasi penggunaan memori dari proses dari user space.
+       </para>
+      </listitem>
+      <listitem>
+
+       <para>
+        Mengatur penggunaan swap dengan pengaturan <literal>swappacount=1</literal>
+        sebagai sebuah parameter boot kernel.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Membatasi laman LRU (Least Recently Used).
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Anonimus dan bekas cache.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Tidak membatasi memori kernel.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Mungkin pada subsistem lain jika dibutuhkan.
+       </para>
+      </listitem>
+     </itemizedlist>
+     <para>
+      Untuk informasi lebih lanjut, lihat
+      <filename>/usr/src/linux/Documentation/cgroups/memory.txt</filename>.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+
+    <term>Blkio (Resource Control)</term>
+    <listitem>
+     <para>
+      Pengendali blkio (Block IO) sekarang tersedia sebagai pengendali I/O
+      diska. Dengan pengendali blkio anda dapat mengeset atura untuk bandwidth
+      proporsional dan untuk penghambatan.
+     </para>
+     <para>
+      Berikut merupakan perintah dasar untuk mengkonfigurasi bobot proporsional
+      pembagian dari bandwidth dengan mengatur nilai bobot pada
+      <literal>blkio.weight</literal>:
+     </para>
+     <screen># Pengaturan pada /sys/fs/cgroup
+mkdir /sys/fs/cgroup/blkio
+mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
+# Memulai dua cgroup
+mkdir -p /sys/fs/cgroup/blkio/group1 /sys/fs/cgroup/blkio/group2
+# Mengatur bobot
+echo 1000 &gt; /sys/fs/cgroup/blkio/group1/blkio.weight
+echo  500 &gt; /sys/fs/cgroup/blkio/group2/blkio.weight
+# Menulis PID dari proses yang akan dikontrol pada grup
+# yang layak
+<replaceable>command1</replaceable> &amp;
+echo $! &gt; /sys/fs/cgroup/blkio/group1/tasks
+
+<replaceable>command2</replaceable> &amp;
+echo $! &gt; /sys/fs/cgroup/blkio/group2/tasks
+</screen>
+     <para>
+      Berikut merupakan perintah dasar untuk mengkonfigurasi kebijakan
+      penghambatan atau batas atas dengan mengatur nilai pada
+      <literal>blkio.throttle.read_bps_device</literal> untuk baca
+      <literal>blkio.throttle.write_bps_device</literal> untuk tulis:
+     </para>
+     <screen># Pengaturan pada /sys/fs/cgroup
+mkdir /sys/fs/cgroup/blkio
+mount -t cgroup -o blkio none /sys/fs/cgroup/blkio
+# Nilai bandwidth pada sebuah divais pada group root; format:
+# &lt;major&gt;:&lt;minor&gt;  &lt;byes_per_second&gt;
+echo "8:16  1048576" &gt; /sys/fs/cgroup/blkio/blkio.throttle.read_bps_device
+</screen>
+     <para>
+      Untuk informasi tentang surat protes, skenario penggunaan, dan parameter
+      tambahan, lihat
+      <filename>/usr/src/linux/Documentation/cgroups/blkio-controller.txt</filename>.
+     </para>
+
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Network I/O (Resource Control) (Draft)
+   </term>
+    <listitem>
+     <para>
+      Masih dalam proses diskusi.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+ <sect1 id="sec.tuning.cgroups.usage">
+  <title>Menggunakan Grup Kontroler</title>
+
+
+
+  <para/>
+
+  <sect2 id="sec.tuning.cgroups.usage.prer">
+   <title>Syarat</title>
+   <para>
+    Untuk menggunakn cgroup dengan baik, install paket tambahan berikut:
+   </para>
+   <itemizedlist mark="bullet" spacing="normal">
+    <listitem>
+     <para>
+      <systemitem>libcgroup1</systemitem> — tool user space dasar untuk
+      menyederhanakan manajamenen resource
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <systemitem>cpuset</systemitem> — berisi
+      <command>cset</command> untuk memanipulasi cpuset
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <systemitem>libcpuset1</systemitem> — API C untuk cpuset
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <systemitem>kernel-source</systemitem> — hanya dibutuhkan untuk 
+      tujuan dokumentasi
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <systemitem>lxc</systemitem> — implementasi linux container
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect2>
+
+  <sect2 id="sec.tuning.cgroups.usage.env">
+   <title>Memeriksa Environment</title>
+   <para>
+    Kernel dikirim dengan dukungan cgroup <pharse os="osuse">openSUSE</phrase>. Sehingga tidak
+    diperlukan patch tambahan. Eksekusi <command>lxc-checkconfig</command>
+    untuk melihat environment cgroup yang mirip dengan output berikut:
+   </para>
+   <screen>--- Namespaces ---
+Namespaces: enabled
+Utsname namespace: enabled
+Ipc namespace: enabled
+Pid namespace: enabled
+User namespace: enabled
+Network namespace: enabled
+Multiple /dev/pts instances: enabled
+
+--- Control groups ---
+Cgroup: enabled
+Cgroup namespace: enabled
+Cgroup device: enabled
+Cgroup sched: enabled
+Cgroup cpu account: enabled
+Cgroup memory controller: enabled
+Cgroup cpuset: enabled
+
+--- Misc ---
+Veth pair device: enabled
+Macvlan: enabled
+Vlan: enabled
+File capabilities: enabled
+</screen>
+   <para>
+    Untuk mengetahui subsistem mana saja yang tersedia, lakukan hal berikut:
+   </para>
+   <screen>mkdir /cgroups
+mount -t cgroup none /cgroups
+grep cgroup /proc/mounts
+</screen>
+   <para>
+    Berikut merupakan subsistem yang tersedia:
+
+    perf_event, blkio, net_cls, freezer, devices, memory, cpuacct, cpu,
+    cpuset.
+
+   </para>
+  </sect2>
+
+  <sect2 id="sec.tuning.cgroups.usage.ex.cpusets">
+   <title>Contoh: Cpusets</title>
+   <para>
+    Dengan perintah baris lakukan sebagai berikut:
+   </para>
+   <procedure>
+    <step performance="required">
+     <para>
+      Untuk menentukan jumlah dari CPU dan node memori lihat
+      <filename>/proc/cpuinfo</filename> and
+      <filename>/proc/zoneinfo</filename>.
+     </para>
+    </step>
+    <step performance="required">
+     <para>
+      membuat hierarki cpuset sebagai sebuah berkas sistem virtual (source:
+      /usr/src/linux/Documentation/cgroups/cpusets.txt):
+     </para>
+     <screen>mount -t cgroup -ocpuset cpuset /sys/fs/cgroup/cpuset
+cd /sys/fs/cgroup/cpuset
+mkdir Charlie
+cd Charlie
+# Melihat daftar CPU pada cpuset ini:
+echo 2-3 &gt; cpuset.cpus
+# Mendaftar node memori pada cpuset ini:
+echo 1 &gt; cpuset.mems
+echo $$ &gt; tasks
+# Subshell 'sh' sekarang berjalan pada cpuset Charlie
+# Baris selanjutnya harus menampilkan'/Charlie'
+cat /proc/self/cpuset
+</screen>
+    </step>
+    <step performance="required">
+     <para>
+      Menghapus cpuset menggunakan perintah shell:
+     </para>
+     <screen>rmdir /sys/fs/cgroup/cpuset/Charlie
+   </screen>
+     <para>
+      Hal ini akan gagal bila cpuset ini sedan digunakan. Pertama, anda harus
+      menghapus yang ada didalam cpuset atau tugas (proses) yang termasuk kedalamnya.
+      Periksa dengan:
+     </para>
+     <screen>cat /sys/fs/cgroup/cpuset/Charlie/tasks</screen>
+    </step>
+   </procedure>
+   <para>
+    Untuk informasi latar belakan dan flag konfigurasi tambahan, lihat
+    <filename>/usr/src/linux/Documentation/cgroups/cpusets.txt</filename>.
+   </para>
+   <para>
+    With the <command>cset</command> tool, proceed as follows:
+    Dengan tool <command>cset</command>, lanjutkan sebagai berikut:
+   </para>
+   <screen># Menentukan jumlah CPU dan node Memori
+cset set --list
+# Membuat hierarki cpuset
+cset set --cpu=2-3 --mem=1 --set=Charlie
+# Memulai proses pada cpuset
+cset proc --set Charlie --exec -- stress -c 1 &amp;
+# Memindahkan proses yang ada ke sebuah cpuset
+cset proc --move --pid <replaceable>PID</replaceable> --toset=Charlie
+# Lihat daftar tugas pada cpuset
+cset proc --list --set Charlie
+# Menghapus cpuset
+cset set --destroy Charlie
+ </screen>
+  </sect2>
+
+  <sect2 id="sec.tuning.cgroups.usage.ex.cg">
+   <title>Contoh: cgroups</title>
+   <para>
+    Menggunakan perintah shell, lakukan hal berikut:
+   </para>
+   <procedure>
+    <step performance="required">
+     <para>
+      Buat hierarki cgroup:
+     </para>
+     <screen>mount -t cgroup cgroup /sys/fs/cgroup
+cd /sys/fs/cgroup/cpuset/cgroup
+mkdir priority
+cd priority
+cat cpu.shares
+</screen>
+    </step>
+    <step performance="required">
+     <para>
+      Memahami cpu.shares:
+     </para>
+     <itemizedlist mark="bullet" spacing="normal">
+      <listitem>
+       <para>
+        1024 is the default (for more information, see
+        1024 merupakan bawaan (untuk informasi lebih lanjut, lihat
+        <filename>/Documentation/scheduler/sched-design-CFS.txt</filename>)
+        = 50% penggunaan
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        1524 = 60% penggunaan
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        2048 = 67% penggunaan
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        512 = 40% penggunaan
+       </para>
+      </listitem>
+     </itemizedlist>
+    </step>
+    <step performance="required">
+     <para>
+      Mengubah cpu.shares
+     </para>
+     <screen>echo 1024 &gt; cpu.shares</screen>
+    </step>
+   </procedure>
+  </sect2>
+
+
+
+
+ </sect1>
+ <sect1 id="sec.tuning.cgroups.info">
+  <title>Untuk Informasi Lebih Lanjut</title>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     Dokumentasi Kernel (paket <systemitem>kernel-source</systemitem>):
+     pada berkas <filename>/usr/src/linux/Documentation/cgroups</filename>:
+    </para>
+    <itemizedlist mark="bullet" spacing="normal">
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/blkio-controller.txt</filename>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/cgroups.txt</filename>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/cpuacct.txt</filename>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/cpusets.txt</filename>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/devices.txt</filename>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/freezer-subsystem.txt</filename>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/memcg_test.txt</filename>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/memory.txt</filename>
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>/usr/src/linux/Documentation/cgroups/resource_counter.txt</filename>
+      </para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+   
+   <listitem>
+    <para>
+     <ulink url="http://lwn.net/Articles/243795/"/>—Corbet, Jonathan:
+     Controlling memory use in containers (2007).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <ulink url="http://lwn.net/Articles/236038/"/>—Corbet, Jonathan:
+     Process containers (2007).
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+</chapter>

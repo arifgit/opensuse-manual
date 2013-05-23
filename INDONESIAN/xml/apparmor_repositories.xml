@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="apparmor_repositories.xml" id="cha.apparmor.repos">
+ <title>Repositori Profil AppArmor</title>
+ <para>
+  AppArmor menyediakan beberapa profil yang disediakan secara default. Profil ini dibuat oleh pengembang AppArmor dan tersimpan dalam
+  <filename>/etc/apparmor.d</filename>. Selain profil tersebut,
+  <phrase os="sles;sled;osuse"><phrase os="osuse">openSUSE</phrase></phrase> juga menyediakan profil bagi aplikasi tunggal dengan aplikasi yang relevan. Profil ini tidak diaktifkan secara default dan berada di dalam direktori lain selain profil AppArmor standar, <filename>/etc/apparmor/profiles/extras</filename>.
+ </para>
+
+ <sect1 id="sec.apparmor.repos.local">
+  <title>Menggunakan Repositori Lokal</title>
+
+  <para>
+   AppArmor (YaST, aa-genprof dan aa-logprof) mendukung penggunaan repositori lokal. Setiap kali anda memulai membuat profil baru dari awal dan anda sudah memiliki satu profil aktif dalam repositori lokal anda sebelumnya, anda akan ditanya apakah anda ingin menggunakan satu aktif yang ada dari <filename>/etc/apparmor/profiles/extras</filename> dan apakah anda ingin menjadikan ini sebagai dasar. Jika anda memutuskan untuk menggunakannya, profil ini akan disalin ke direktori profil yang diaktifkan secara default pada (<filename>/etc/apparmor.d</filename>) dan akan dimuat setiap kali AppArmor dimulai. Setiap penyesuaian lebih lanjut akan dilakukan ke profil aktif pada <filename>/etc/apparmor.d</filename>.
+  </para>
+ </sect1>
+
+
+</chapter>

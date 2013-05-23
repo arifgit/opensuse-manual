@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="qemu_overview.xml" id="cha.qemu.overview">
+ <title>QEMU Overview</title>
+ <para>
+  QEMU is a fast, cross-platform Open Source machine emulator which can
+  emulate a huge number of hardware architectures for you. QEMU lets you
+  run a complete unmodified operating system (VM Guest) on top of your
+  existing system (VM Host Server).
+ </para>
+ <para>
+  You can also use QEMU for debugging purposes - you can easily stop your
+  running virtual machine, inspect its state and save and restore it later.
+ </para>
+ <para>
+  QEMU consists of the following parts:
+ </para>
+ <itemizedlist mark="bullet" spacing="normal">
+  <listitem>
+   <para>
+    processor emulator (x86, PowerPC, Sparc ...)
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    emulated devices (graphic card, network card, hard drives, mice ...)
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    generic devices used to connect the emulated devices to the related host
+    devices
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    descriptions of the emulated machines (PC, Power Mac ...)
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    debugger
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    user interface used to interact with the emulator
+   </para>
+  </listitem>
+ </itemizedlist>
+ <para>
+  As a virtualization solution, QEMU can be run together with the KVM
+  kernel module. If the VM Guest hardware architecture is the same as
+  VM Host Server's architecture, QEMU can take advantage of the KVM
+  acceleration.
+ </para>
+</chapter>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="apparmor_pam.xml" id="cha.apparmor.pam">
+ <title>Membatasi Pengguna menggunakan <systemitem>pam_apparmor</systemitem></title>
+ <para>
+  Profil AppArmor hanya berlaku untuk program yang dapat dieksekusi, jika sebagian dari program membutuhkan hak akses yang berbeda daripada bagian lain butuhkan, program ini dapat mengubah "hats" melalui change_hat untuk peran yang berbeda, juga dikenal sebagai sebuah subprofil. Modul pam_apparmor  memungkinkan aplikasi untuk membatasi otentifikasi pengguna ke subprofil berdasarkan nama grup, nama pengguna, atau profil default. Untuk mencapai hal ini, pam_apparmor harus terdaftar dulu sebagai modul sesi PAM.
+ </para>
+ <para>
+  Paket pam_apparmor tidak terpasang secara default, anda perlu menginstalnya menggunakan YaST atau <command>zypper</command>. Rincian tentang cara mengatur dan mengkonfigurasi pam_apparmor dapat ditemukan di
+  <filename>/usr/share/doc/packages/pam_apparmor/README</filename> setelah paket tersebut dipasang. Untuk rincian tentang PAM, lihat
+  <xref linkend="cha.pam"/>.
+ </para>
+ <para>
+  pam_apparmor memungkinkan anda untuk mengatur role-based access control (RBAC). Sebuah HOWTO rinci tentang pengaturan RBAC dengan AppArmor tersedia di
+  <ulink url="http://wiki.apparmor.net/index.php/AppArmorRBAC"/>.
+ </para>
+</chapter>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="64bit_issues.xml" id="cha.64bit">
+ <title>Aplikasi 32-Bit dan 64-Bit pada Lingkungan Sistem 64-Bit </title><indexterm>
+ <primary>Linux 64-bit</primary></indexterm>
+ <para>
+  <phrase os="osuse">openSUSE®</phrase> tersedia dengan platform 64-bit. Ini bukan berarti bahwa semua aplikasi yang disertakan telah porting ke platform 64-bit, <phrase os="osuse">openSUSE</phrase>
+  mendukung penggunaan aplikasi 32-bit dalam lingkungan sistem 64-bit.
+  Bab ini menyediakan gambaran singkat tentang bagaimana dukungan ini diimplementasikan pada
+  platform <phrase os="osuse">openSUSE</phrase> 64-bit. Pada bab ini juga akan menjelaskan bagaimana aplikasi 32-bit dijalankan (runtime support) dan bagaimana aplikasi 32-bit dikompilasi agar memungkinkan mereka dapat dijalankan pada kedua lingkungan sistem, 32-bit dan 64-bit.
+  Sebagai tambahan, cari juga informasi tentang API kernel dan penjelasan tentang bagaimana aplikasi 32-bit dapat berjalan di kernel 64-bit.
+ </para>
+ <para>
+  <phrase os="osuse;sled"><phrase os="osuse">openSUSE</phrase> untuk platform
+  64-bit, amd64 dan Intel 64</phrase> dirancang agar aplikasi 32-bit yang ada dijalankan dalam lingkungan 64-bit tanpa konfigurasi tambahan,
+  <quote>out-of-the-box.</quote> 
+  Dengan dukungan ini berarti bahwa anda akan dapat terus menggunakan aplikasi 32-bit pilihan anda tanpa harus menunggu port 64-bit yang sesuai menjadi tersedia.
+ </para>
+ <sect1 id="sec.64bit.runt">
+  <title>Runtime Support</title><indexterm>
+
+  <primary>64-bit Linux</primary>
+
+  <secondary>runtime support</secondary></indexterm>
+
+  <important>
+   <title>Konflik diantara Versi Aplikasi</title>
+   <para>
+    Jika ada sebuah aplikasi tersedia baik untuk lingkungan 32-bit dan 64-bit, instalasi sekaligus kedua versi dapat menimbulkan masalah. Dalam kasus tersebut, anda harus memutuskan salah satu dari dua versi sebelum menginstal dan menggunakannya.
+   </para>
+   <para>
+    Pengecualian terhadap aturan ini disebut PAM (pluggable authentication modules).
+    <phrase os="osuse">openSUSE</phrase> menggunakan PAM dalam proses otentikasi sebagai bagian yang menengahi antara pengguna dan aplikasi. Pada sistem operasi 64-bit yang juga menjalankan aplikasi 32-bit itu perlu untuk selalu memasang kedua versi modul PAM.
+   </para>
+  </important>
+
+  <para>
+   Untuk dapat dieksekusi dengan benar, setiap aplikasi membutuhkan berbagai pustaka. Sayangnya, nama-nama untuk versi 32-bit dan 64-bit pustaka ini sama. Mereka harus dibedakan dahulu antara satu dengan yang lain menggunakan cara lain.
+  </para>
+
+  <para>
+   Untuk mempertahankan kecocokan dengan versi 32-bit, pustaka disimpan di tempat yang sama dalam sistem seperti dalam lingkungan 32-bit. Versi 32-bit dari<filename>libc.so.6</filename> Terletak di 
+   <filename>/lib/libc.so.6</filename> baik di lingkungan 32-bit dan 64-bit.
+  </para>
+
+  <para>
+   Semua pustaka 64-bit dan file objek yang terletak di direktori disebut
+   <filename>lib64</filename>. File obyek 64-bit yang biasanya  ditemukan pada direktori <filename>/lib</filename> dan
+   <filename>/usr/lib</filename> sekarang akan ditemukan pada
+   <filename>/lib64</filename> dan <filename>/usr/lib64</filename>. Ini berarti bahwa akan ada ruang untuk pustaka 32-bit di bawah
+   <filename>/lib</filename> dan <filename>/usr/lib</filename>, sehingga nama file untuk kedua versi dapat tetap atau tidak berubah.
+  </para>
+
+  <para>
+   Subdirektori 32-bit <filename>/lib</filename> direktori yang berisi konten data yang tidak bergantung pada ukuran kata yang tidak bergerak.
+   Skema ini sesuai dengan LSB (Linux Standards Base) dan FHS (File System
+   Hierarchy Standard).
+  </para>
+
+  
+ </sect1>
+ <sect1 id="sec.64bit.devel">
+  <title>Pengembangan Software</title><indexterm>
+
+  <primary>Linux 64-bit</primary>
+
+  <secondary>pengembangan software</secondary></indexterm>
+
+  
+
+  
+
+  <para os="osuse;sled">
+   Sebuah alat pengembangan, biarch, yang memungkinkan untuk menghasilkan obyek 32-bit dan 64-bit. Awalnya untuk mengkompilasi obyek 64-bit. tetapi juga mungkinkan untuk menghasilkan objek 32-bit dengan menggunakan flags khusus. Pada GCC, flag khusus tersebut adalah <option>-m32</option>.
+  </para>
+
+  <para>
+   Semua file header harus ditulis dalam bentuk arsitektur-independen. Pustaka 32-bit dan 64-bit yang terpasang harus memiliki API (application
+   programming interface) harus sesuai dengan file header yang terpasang juga. Lingkungan <phrase os="osuse">openSUSE</phrase> dirancang sesuai dengan prinsip ini.
+   Dalam kasus pustaka yang diperbarui secara manual, atasi masalah ini sendiri.
+  </para>
+ </sect1>
+ <sect1 id="sec.64bit.biarch">
+  <title>Mengkompilasi Software pada Platform Biarch</title>
+
+  <para>
+   Untuk mengembangkan binari bagi arsitektur lain pada arsitektur biarch, pustaka pada masing-masing untuk arsitektur kedua harus diinstal. Paket ini disebut
+   <systemitem class="resource">rpmname-32bit</systemitem>. Anda juga perlu masing-masing header dan pustaka dari paket
+   <systemitem class="resource">rpmname-devel</systemitem> dan pustaka pengembangan untuk arsitektur kedua dari
+   <systemitem class="resource">rpmname-devel-32bit</systemitem>.
+  </para>
+
+  
+
+  
+
+  <para>
+   Banyak program open source menggunakan sebuah konfigurasi program <command>autoconf</command>-based. Untuk menggunakan <command>autoconf</command> untuk mengkonfigurasi
+   sebuah program untuk arsitektur kedua, timpa kompiler normal dan atur linker dari <command>autoconf</command> dengan menjalankan script <command>configure</command> menggunakan variabel lingkungan tambahan.
+  </para>
+
+  <para>
+   Contoh berikut adalah suatu sistem x86_64 dengan x86 sebagai arsitektur kedua. 
+  </para>
+
+  <procedure>
+   <step performance="required">
+    <para>
+     Menggunakan kompiler 32-bit:
+    </para>
+<screen>CC="gcc -m32"</screen>
+   </step>
+   <step performance="required">
+    <para>
+     Instruksikan linker untuk memproses obyek 32-bit (agar selalu menggunakan
+     <command>gcc</command> sebagai linker):
+    </para>
+<screen>LD="gcc -m32"</screen>
+   </step>
+   <step performance="required">
+    <para>
+     Atur assembler untuk menghasilkan obyek 32-bit:
+    </para>
+<screen>AS="gcc -c -m32"</screen>
+   </step>
+   <step performance="required">
+    <para>
+     Tentukan flag linker, seperti lokasi pustaka 32-bit, misalnya:
+    </para>
+<screen>LDFLAGS="-L/usr/lib"</screen>
+   </step>
+   <step performance="required">
+    <para>
+     Tentukan lokasi untuk kode pustaka objek 32-bit:
+    </para>
+<screen>--libdir=/usr/lib</screen>
+   </step>
+   <step performance="required">
+    <para>
+     Tentukan lokasi untuk pustaka X 32-bit
+    </para>
+<screen>--x-libraries=/usr/lib</screen>
+   </step>
+  </procedure>
+
+  <para>
+   Tidak semua variabel diperlukan bagi setiap program. Sesuaikan pada masing-masing program.
+  </para>
+
+  
+
+<screen>CC="gcc -m32"
+LDFLAGS="-L/usr/lib;"
+./configure --prefix=/usr --libdir=/usr/lib --x-libraries=/usr/lib
+make
+make install</screen>
+ </sect1>
+ <sect1 id="sec.64bit.kernel">
+  <title>Spesifikasi Kernel</title><indexterm>
+
+  <primary>Linux 64-bit</primary>
+
+  <secondary>spesifikasi kernel</secondary></indexterm>
+
+  <para>
+   Kernel 64-bit untuk x86_64 mengacu kepada ABI (application binary interface;aplikasi antarmuka biner) kernel 64-bit dan 32-bit. Yang terakhir adalah identik dengan ABI untuk kernel 32-bit yang sesuai. Ini artinya aplikasi 32-bit dapat berkomunikasi dengan kernel 64-bit dalam cara yang sama seperti dengan kernel 32-bit.
+  </para>
+
+  <para>
+   Emulasi 32-bit untuk kernel 64-bit tidak mendukung semua API yang digunakan oleh program sistem. Hal ini tergantung pada platform. Untuk alasan ini, sejumlah kecil aplikasi, seperti <command>lspci</command>, harus dikompilasi.
+  </para>
+
+  <para>
+   Sebuah kernel 64-bit hanya dapat memuat modul kernel 64-bit yang telah dikompilasi khusus untuk kernel ini. Hal ini tidak mungkin untuk menggunakan 32-bit modul kernel.
+  </para>
+
+  <tip>
+   <title>Modul Kernel-loadable</title>
+   <para>
+    Beberapa aplikasi memerlukan modul kernel-loadable terpisah. Jika anda berniat untuk menggunakan seperti aplikasi 32-bit dalam lingkungan sistem 64-bit, hubungi penyedia aplikasi tersebut dan SUSE, ini untuk memastikan bahwa versi 64-bit dari modul kernel-loadable dan dikompilasi versi 32-bit API kernel yang tersedia untuk modul tersebut.
+   </para>
+  </tip>
+ </sect1>
+</chapter>

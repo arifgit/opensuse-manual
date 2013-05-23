@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<sect1 xml:base="common_intro_source_code_i.xml">
+ <title>Source Code</title>
+ <para>
+  The source code of <phrase os="osuse">openSUSE</phrase> is publicly available. Refer to <ulink url="http://en.opensuse.org/Source_code"/> for download links and more
+  information.
+ </para>
+</sect1>

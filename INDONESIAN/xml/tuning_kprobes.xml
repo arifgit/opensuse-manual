@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="tuning_kprobes.xml" id="cha.tuning.kprobes">
+ <title>Probe Kernel</title>
+
+
+
+ <para>
+  Probe kernel merupakan kumpulan dari alat untuk mengumpulkan informasi debug dan performa
+  dari kernel Linux. Pengembang dan sistem administrator biasanya menggunakan ini untuk mendebug
+  atau mencari bottleneck performa sistem. Data yang dilaporkan dapat digunakan untuk melakukan
+  tuning pada sistem agar mempunyai performa yang lebih baik.
+ </para>
+ <para>
+  Anda dapat menyisipkan probe kernel pada semua rutin kernel, dan menyesifikkan handler yang
+  diikutsertakan setelah break-point tertentu sudah tercapai. Keuntungan utama dari
+  kernel probe adalah anda tidak perlu lagi membangun ulang kernel dan mereboot sistem
+  setelah melakukan perubahan pada probe.
+ </para>
+ <para>
+  Untuk menggunakan probe kernel, biasanya anda harus menulis atau memiliki modul kernel tertentu.
+  Modul tersebut memiliki fungsi <emphasis>init</emphasis> dan <emphasis>exit</emphasis>. Fungsi
+  ini (seperti <systemitem>register_kprobe()</systemitem>) mencatat satu atau lebih probe,
+  sedangkan fungsi exit menghapus catatan mereka. Fungsi pencatatan membatasi <emphasis>dimana</emphasis>
+  probe akan disisipkan dan <emphasis>handler mana</emphasis> yang akan dipanggil setelah probe
+  mencapai tujuannya. Untuk mencatat dan menghapus catatan pada satu waktu, anda dapat menggunakan fungsi
+  <literal>register_&lt;<replaceable>probe_type</replaceable>&gt;probes()</literal>
+  atau
+  <literal>unregister_&lt;<replaceable>probe_type</replaceable>&gt;probes()</literal> .
+ </para>
+ <para>
+  Pendebugan dan pesan status biasanya dilaporkan dengan
+  rutin kernel <systemitem>printk</systemitem>.
+  <systemitem>printk</systemitem> merupakan kernel-space yang sejajar
+  dengan rutin user-space <systemitem>printf</systemitem>. Untuk informasi lanjutan tentang 
+  <systemitem>printk</systemitem>, lihat
+  <ulink url="http://www.win.tue.nl/~aeb/linux/lk/lk-2.html#ss2.8">Logging
+  kernel messages</ulink>. Biasanya, anda dapat melihat pesan pesan ini dengan memeriksa
+  <filename>/var/log/messages</filename> atau
+  <filename>/var/log/syslog</filename>. Untuk informasi pada berkas log,
+  lihat <xref linkend="cha.tuning.logfiles"/>.
+ </para>
+ <sect1 id="cha.tuning.kprobes.supparch">
+  <title>Arsitektur yang Didukung</title>
+
+  <para>
+   Probe kernel <emphasis>sepenuhnya</emphasis> diimplementasikan pada arsitektur berikut:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     i386
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     x86_64 (AMD-64, EM64T)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     ppc64
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     arm
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     ppc
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Probe kernel diimplementasikan <emphasis>sebagian saja</emphasis> pada arsitektur berikut:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     ia64 (tidak mendukung probe pada instruksi
+     <systemitem>slot1</systemitem>)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     sparc64 (probe return belum diimplementasikan)
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <sect1 id="cha.tuning.kprobes.types">
+  <title>Jenis Probe Kernel</title>
+
+  <para>
+   Ada tiga jenis probe kernel: <emphasis>kprobes</emphasis>, <emphasis>jprobes</emphasis>,
+   dan <emphasis>kretprobes</emphasis>.
+   Kretprobes sering kali disebut <emphasis>probe return</emphasis>. Anda dapat mencari contoh
+   kode sumber yang cukup jelas untuk ketiga jenis probe kernel pada direktori
+   <filename>/usr/src/linux/samples/kprobes/</filename> (paket <systemitem>kernel-source</systemitem>).
+  </para>
+
+  <sect2 id="cha.tuning.kprobes.types.kprobe">
+   <title>Kprobe</title>
+   <para>
+    Kprobe dapat disambungkan dengan instruksi apapun pada kernel linux. Ketika didaftarkan,
+    probe ini menyisipkan break-point pada byte pertama dari instruksi yang sudah diprobe.
+    Ketika prosesor mencapai break-point, register prosesor akan disimpan, dan proses diterukan
+    ke kprobes. Pertama, sebuah <emphasis>pre-handler</emphasis> dieksekusi, lalu
+    instruksi yang diprobe akan dilalui, dan, pada akhirnya sebuah <emphasis>post-handler</emphasis>
+
+
+    dieksekusi. Lalu kontrol akan diteruskan pada instruksi mengikuti titik probe.
+   </para>
+  </sect2>
+
+  <sect2 id="cha.tuning.kprobes.types.jprobe">
+   <title>Jprobe</title>
+   <para>
+    Jprobe diimplementasi melalui mekanisme kprobe. Probe ini disisipkan pada
+    titik masuk fungsi dan mendapatkan akses langsung di argumen fungsi yang diprobe.
+    Handler dari rutin ini harus mempunya daftar argumen dan nilai return yang sama
+    dengan fungsi yang diprobe. Probe ini juga harus diakhiri dengan memanggil 
+    fungsi <systemitem>jprobe_return()</systemitem>.
+   </para>
+   <para>
+    Ketika jprobe sudah terpenuhi, register prosesor akan disimpan, dan pointer
+    instruksi akan diarahkan ke handler rutin jprobe. Kontrol kemudian
+
+
+    diteruskan ke handler yang mempunyai konten registre yang sama dengan fungsi yang diprobe.
+    Akhirnya, handler memanggil fungsi
+    <systemitem>jprobe_return()</systemitem> , dan mengembalikan kontrol kepada fungsi kontrol.
+   </para>
+   <para>
+    Secara umum, anda dapat menyisipkan beberapa probe dalam satu fungsi. Namun, Jprobe
+    dibatasi satu penyisipan tiap fungsi.
+   </para>
+  </sect2>
+
+  <sect2 id="cha.tuning.kprobes.types.kretprobe">
+   <title>Probe Return</title>
+   <para>
+    Probe return juga diimplementasikan melalui kprobe. Ketika fungsi <systemitem>register_kretprobe()</systemitem>
+    dipanggil, sebuah kprobe disambungkan pada titik masuk fungsi yang diprobe.
+
+
+    Setelah probe dipenuhi, mekanisme probe kernel menyimpan alamat return dari fungsi yang diprobe
+    dan memanggil handler return yang ditentukan oleh pengguna. Lalu kontrol akan dikembalikan ke
+    fungsi yang diprobe tadi.
+   </para>
+   <para>
+    Sebelum anda memanggil <systemitem>register_kretprobe()</systemitem>, anda harus
+    mengatur sebuah argumen <systemitem>maxactive</systemitem>, yang menentukan
+    berapa banyak fungsi yang bisa dilaksanakan dalam satu waktu.
+    Jika anda mengatur terlalu rendah, anda akan kehilangan beberapa probe.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1 id="cha.tuning.kprobes.api">
+  <title>API Probe Kernel</title>
+
+  <para>
+   Antar muka pemrograman Kprobe terdiri dari fungsi, yang digunakan untuk
+   mencatat dan menghapus catatan dari probe kernel, dan handler probe yang berkaitan.
+   Untuk deskripsi lebih lanjut dari fungsi dan argumennya, sila lihat sumber informasi pada
+   <xref linkend="cha.tuning.kprobes.moreinfo"/>.
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term><systemitem>register_kprobe()</systemitem>
+    </term>
+    <listitem>
+     <para>
+      Menyisipkan sebuah break-point pada alamat yang ditentukan. Ketika break-point
+      tercapai, <systemitem>pre_handler</systemitem> dan <systemitem>post_handler</systemitem> dipanggil.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><systemitem>register_jprobe()</systemitem>
+    </term>
+    <listitem>
+     <para>
+      Menyisipkan break-point pada alamat yang ditentukan. Alamat itu harus
+      merupakan alamat dari instruksi pertama dari fungsi yang diprobe. Ketika
+      break-point dicapai, handler yang ditentukan akan dijalankan. Handler tersebut
+      harus mempunyai daftar argumen dan nilai return yang sama dengan yang diprobe.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><systemitem>register_kretprobe()</systemitem>
+    </term>
+    <listitem>
+     <para>
+      Menyisipkan probe retun untuk fungsi yang ditentukan. Ketika fungsi yang diprobe sudah
+      mempunyai nilai return, handler yang ditentukan akan dijalankan. Fungsi ini akan
+      mempunyai nilai return 0 bila sukses, atau negatif bila terjadi kesalahan.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><systemitem>unregister_kprobe()</systemitem>, <systemitem>unregister_jprobe()</systemitem>, <systemitem>unregister_kretprobe()</systemitem>
+    </term>
+    <listitem>
+     <para>
+      Menghapus probe yang ditentukan. Anda dapat menggunakannya kapan saja setelah probe
+      didaftarkan / registrasi.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><systemitem>register_kprobes()</systemitem>, <systemitem>register_jprobes()</systemitem>, <systemitem>register_kretprobes()</systemitem>
+    </term>
+    <listitem>
+     <para>
+      Menyisipkan tiap probe pada array yang sudah ditentukan.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><systemitem>unregister_kprobes()</systemitem>, <systemitem>unregister_jprobes()</systemitem>, <systemitem>unregister_kretprobes()</systemitem>
+    </term>
+    <listitem>
+     <para>
+      Menghapus tiap probe pada array yang sudah ditentukan. 
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><systemitem>disable_kprobe()</systemitem>, <systemitem>disable_jprobe()</systemitem>, <systemitem>disable_kretprobe()</systemitem>
+    </term>
+    <listitem>
+     <para>
+      Menonaktifkan sementara probe yang ditentukan.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><systemitem>enable_kprobe()</systemitem>, <systemitem>enable_jprobe()</systemitem>, <systemitem>enable_kretprobe()</systemitem>
+    </term>
+    <listitem>
+     <para>
+      Mengaktifkan probe yang sementara dinonaktifkan.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+ <sect1 id="cha.tuning.kprobes.debugfs">
+  <title>Antar Muka Debugfs</title>
+
+  <para>
+   Pada kernel Linux baru baru ini, intrumentasi probe Kernel menggunakan antarmuka
+   debugfs kernel. Hal ini membantu anda meregistrasi probe dan menjadi switch
+   global probe antara hidup dan mati.
+  </para>
+
+  <sect2 id="cha.tuning.kprobes.debugfs.list">
+   <title>How to List Registered Kernel Probes</title>
+   <title>Cara Mendaftar Probe Kernel yang Terdaftar</title>
+   <para>
+    Daftar semua kprobe yang sedang terdaftar ada pada berkas
+    <filename>/sys/kernel/debug/kprobes/list</filename> .
+   </para>
+<screen>saturn.example.com:~ # cat /sys/kernel/debug/kprobes/list
+c015d71a  k  vfs_read+0x0   [DISABLED]
+c011a316  j  do_fork+0x0
+c03dedc5  r  tcp_v4_rcv+0x0</screen>
+   <para>
+    Kolom pertama daftar merupakan alamat pada kernel dimana probe disisipkan.
+    Kolom kedua mencetak jenis dari probe :
+    <literal>k</literal> untuk kprobe, <literal>j</literal> untuk jprobe, dan
+    <literal>r</literal> untuk probe return. Kolom ketika menentukan
+    simbol, offset dan nama modul opsional pada probe. Kolom opsional selanjutnya
+    berisi dengan informasi status dari probe. Jika probe disisipkan pada alamat
+    virtual yang tidak lagi valid, probe tersebut akan ditandai dengan <literal>[GONE]</literal>.
+    Jika probe dinonaktifkan sementara, maka akan ditandai dengan <literal>[DISABLED]</literal>.
+   </para>
+  </sect2>
+
+  <sect2 id="cha.tuning.kprobes.debugfs.switch">
+   <title>How to Switch All Kernel Probes On or Off</title>
+   <title>Cara Memindah On Off pada Semua Probe Kernel</title>
+   <para>
+    Berkas <filename>/sys/kernel/debug/kprobes/enabled</filename> merepresentasikan
+    switch yang bisa mengaktifkan dan menonaktifkan semua dan paksa pada semua probe kernel
+    yang teregistrasi. Untuk mematikan probe, masukkan
+   </para>
+<screen>echo "0" &gt; /sys/kernel/debug/kprobes/enabled</screen>
+   <para>
+    pada baris perintah sebagai <systemitem class="username">root</systemitem>. Untuk menyalakannya lagi, masukkan
+   </para>
+<screen>echo "1" &gt; /sys/kernel/debug/kprobes/enabled</screen>
+   <para>
+    Harap diperhatikan bahwa dengan cara ini, anda tidak dapat mengubah status dari probe.
+    Jika sebuah probe sementara dinonaktifkan, probe ini tidak akan diaktifkan secara otomatis
+    namun akan tetap dalam kondisi <literal>[DISABLED]</literal> setelah memasukkan
+    perintah diatas.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1 id="cha.tuning.kprobes.moreinfo">
+  <title>Untuk Informasi Lanjutan</title>
+
+  <para>
+   Untuk lebih memahami kernel probe, lihat pada sumber berikut :
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     Informasi yang lebih teknis tentang kernel probe terdapat pada berkas
+     <filename>/usr/src/linux/Documentation/kprobes.txt</filename>
+     (paket <systemitem>kernel-source</systemitem>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Contoh untuk ketiga jenis probe (beserta
+     <filename>Makefile</filename> terkait) ada pada direktori
+     <filename>/usr/src/linux/samples/kprobes/</filename> (paket
+     <systemitem>kenrel-source</systemitem>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Informasi mendalam mengenai modul kernel Linux dan
+     rutin kernel Linux <systemitem>printk</systemitem> 
+     <ulink url="http://tldp.org/LDP/lkmpg/2.6/html/lkmpg.html">The
+     Linux Kernel Module Programming Guide</ulink>
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Informasi praktis namun agak sedikit ketinggalan zaman tentang penggunaan praktis
+     probe kernel ada pada
+     <ulink url="http://www.ibm.com/developerworks/library/l-kprobes.html">Kernel
+     debugging with Kprobes</ulink>
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+</chapter>

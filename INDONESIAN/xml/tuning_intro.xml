@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE preface PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<preface xml:base="tuning_intro.xml" id="preface.tuning">
+ <title>Tentang Panduan Ini</title>
+ <para>
+  <phrase os="osuse">openSUSE</phrase> digunakan dalam banyak skenario penggunaan pada pusat data
+  perusahaan dan keperluan saintifik. SUSE memastikan <phrase os="osuse">openSUSE</phrase> di set
+  sehingga mengakomodasi tujuan operasi yang berbeda dengan performa
+  optimal. Namun, <phrase os="osuse">openSUSE</phrase> harus memenuhi permintaan yang sangat berbeda
+  ketika digunakan pada server pengolahan angka dibanding server berkas, sebagai contoh.
+ </para>
+ <para>
+  Pada umumnya, merupakan hal yang tidak mungkin untuk memberikan distro
+  yang secara bawaan telah teroptimasi untuk segala jenis kebutuhan. Berdasarkan
+  pada kenyataan sederhana bahwa kebutuhan yang berbeda sangat bermacam macam
+  dalam berbagai aspek-terutama pola akses I/O, pola akses memori, dan
+  penjadwalan proses. Sebuah perilaku yang tepat cocok pada sebuah kebutuhan
+  mungkin mengurangi performa pada sebuah kebutuhan yang lain (misal, basis data
+  yang mempunyai I/O intensif biasanya mempunyai kebutuhan yang sangat berbeda
+  dengan tugas yang membutuhkan CPU sangat tinggi, seperti enkoding video).
+  Keluwesan Linux membuat mungkin untuk mengkonfigurasi sistem anda sehingga
+  menghasilkan skenario penggunaan terbaik.
+ </para>
+ <para>
+  Manual ini memperkenalkan anda untuk mengawasi dan menganalisis sistem anda.
+  Ini juga mendeskripsi metode untuk mengatur resource sistem dan tuning sistem anda.
+  Panduan ini <emphasis>tidak</emphasis> memberikan langkah untuk skenario khusus,
+  karena tiap server mempunyai permintaan yang berbeda. Panduan ini membuat anda
+  menganalisis server anda dan memaksimalkannya.
+ </para>
+ <variablelist>
+  <varlistentry>
+   <term>Catatan Umum Pada Tuning Sistem</term>
+   <listitem>
+    <para>
+     Tuning sistem membutuhkan perencanaan yang hati hati sebelumnya.
+     Pelajari langkah mana yang penting untuk meningkatkan sistem anda.
+    </para>
+   </listitem>
+  </varlistentry>
+
+  <varlistentry>
+
+   <term><xref linkend="part.tuning.monitoring"/>
+   </term>
+   <listitem>
+    <para>
+     Linux menawarkan banyak macam alat untuk mengawasi hampir semua aspek
+     dari sistem. Pelajari bagaimana cara penggunaan alat ini dan cara membaca
+     dan menganalisis berkas log sistem.
+    </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+
+   <term><xref linkend="part.tuning.kerneltrace"/>
+   </term>
+   <listitem>
+    <para>
+     Kernel Linux sendiri menawarkan pemeriksaan tiap bagian dari sistem.
+     Bagian ini memperkenalkan anda pada SystemTap, sebuah bahasa skrip
+     untuk menulis modul kernel yang dapat digunakan untuk menganalisis
+     dan menyaring data. Mengumpulkan informasi debugdan mencari bottleneck
+     dengan menggunakan penyambungan kernel dan menggunakan perfmon2 untuk
+     mengakses performa CPU. Terakhir, aplikasi monitor dengan bantuan Oprofile.
+    </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+
+   <term><xref linkend="part.tuning.resources"/>
+   </term>
+   <listitem>
+    <para>
+     Pelajari bagaimana cara menyetting sistem yang sesuai dengan kebutuhan
+     server. Ketahui bagaimana cara penggunaan manajemen daya pada saat yang
+     sama menjaga performa sistem pada tingkat yang sama dengan kebutuhan
+     saat ini.
+    </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+
+   <term><xref linkend="part.tuning.kernel"/>
+   </term>
+   <listitem>
+    <para>
+     Kernel linux dapat dioptimisasi menggunakan sysctl atau menggunakan 
+     sistem berkas <filename>/proc</filename>. Bagian ini melingkupi tuning
+     performa I/O dan mengoptimasi proses penjadwalan. Bagian ini juga
+     mendeskripsikan prinsip dasar manajemen memori dan menunjukkan bagaimana
+     manajemen memori terset dengan baik agar sesuai dengan pola penggunaan
+     dan aplikasi yang spesifik. Lebih lanjut, bagian ini mendeskripsikan bagaimana
+     mengoptimasi performa jaringan.
+    </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+
+   <term><xref linkend="part.tuning.dumps"/>
+   </term>
+   <listitem>
+    <para>
+     Bagian ini menunjukkan kepada anda bagaimana menganalisis dan menangani
+     aplikkasi atau sistem yang crash. Bagian ini memperkenalkan alat penelusuran
+     seperti strace atau ltrace dan mendeskripsikan bagaimana menangani sistem
+     yang crash menggunakan Kexec dan Kdump.
+    </para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+ 
+ <para>
+  Banyak bab pada manual ini berisi tautan ke dokumentasi tambahan.
+  Juga termasuk dokumentasi tambahan yang tersedia pada sistem sebagaimana
+  dokumentasi yang tersedia di Internet.
+ </para>
+ <para>
+  section:
+  Untuk kilasan dari dokumentasi yang tersedia untuk produk anda dan pemutakhiran
+  dokumentasi terbaru, silakan mengacu pada
+  <urlink url="http://www.suse.com/documentation"> atau bagian berikut:
+ </para>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="common_intro_available_doc_i.xml" parse="xml"/>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="common_intro_feedback_i.xml" parse="xml"/>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="common_intro_typografie_i.xml" parse="xml"/>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" os="osuse" href="common_intro_making_i.xml" parse="xml"/>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" os="osuse" href="common_intro_source_code_i.xml" parse="xml"/>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" os="osuse" href="common_intro_acknowl_i.xml" parse="xml"/>
+</preface>

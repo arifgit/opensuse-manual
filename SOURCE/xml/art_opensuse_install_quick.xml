@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<chapter xml:base="art_opensuse_install_quick.xml" id="art.osuse.installquick">
+ <title>Installation Quick Start</title>
+ <abstract>
+  <para>
+   Use the following procedures to install a new version of <phrase os="osuse">openSUSE®</phrase>
+   <phrase os="osuse">12.3</phrase>. This document gives a quick overview on how to run
+   through a default installation of <phrase os="osuse">openSUSE</phrase>.
+  </para>
+ </abstract> 
+ <sect1 id="sec.osuse.installquick">
+  <title>Welcome to <phrase os="osuse">openSUSE</phrase></title>
+
+  <para>
+   For more detailed installation instructions and deployment strategies,
+   see the <phrase os="osuse">openSUSE</phrase> documentation at
+   <ulink url="http://doc.opensuse.org/"/>.
+  </para>
+ </sect1>
+
+  <sect1 id="sec.osuse.installquick.sysreqs">
+   <title>System Requirements</title>
+   <itemizedlist mark="check" spacing="normal">
+    <listitem>
+     <para>
+      Pentium* III 500 MHz or higher processor (Pentium 4 2.4 GHz or higher
+      or any AMD64 or Intel* EM64T processor recommended)
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      512 MB physical RAM (1 GB recommended)
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      3 GB available disk space (more recommended)
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      800 x 600 display resolution (1024 x 768 or higher recommended)
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect1>
+
+  <sect1 id="sec.osuse.installquick.install">
+   <title>Installing <phrase os="osuse">openSUSE</phrase></title>
+   <para>
+    Use these instructions if there is no existing Linux system on your
+    machine, or if you want to replace an existing Linux system.
+   </para>
+<?dbfo-need height="10em"?>
+
+   <procedure>
+    <step performance="required">
+     <para>
+      Insert the <phrase os="osuse">openSUSE</phrase> DVD into the drive, then reboot the computer
+      to start the installation program.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_boot.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_boot.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Select <guimenu>Installation</guimenu> on the boot screen and press
+      <keycap>Enter</keycap>. This loads the <phrase os="osuse">openSUSE</phrase> installation
+      program and starts the installation in normal mode.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_welcome.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_welcome.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Select the language and the keyboard layout to be used during the
+      installation and for the installed system.
+     </para>
+     <para>
+      Read the License Agreement and proceed with <guimenu>Next</guimenu> if
+      you agree. If you do not agree, press <guimenu>Abort</guimenu> to
+      terminate the installation.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_mode.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_mode.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Select <guimenu>New Installation</guimenu> and proceed with
+      <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_timezone.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_timezone.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Either use the map or the drop down lists for
+      <guimenu>Region</guimenu> and <guimenu>Time Zone</guimenu> to select
+      the clock and time zone to use in your system. Proceed with
+      <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_sys_type.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_sys_type.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Select the desktop system you would like to use.
+      <guimenu>KDE</guimenu> and <guimenu>GNOME</guimenu>, are powerful
+      graphical desktop environments, with KDE being a bit similar to Windows,
+      alternative selections are available when checking <guimenu>Other</guimenu>.
+      Proceed with <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_partitioning.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_partitioning.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Define a partition setup for <phrase os="osuse">openSUSE</phrase> in this step. In most cases
+      a reasonable scheme that can be accepted without change is proposed.
+      Accept the proposal with <guimenu>Next</guimenu> and proceed with the
+      installation. Experienced users can also customize the proposal
+      (<guimenu>Edit Partition Setup</guimenu>) or apply their own
+      partitioning scheme (<guimenu>Create Partition Setup</guimenu>).
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_user.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_user.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Type your first and last name in the <guimenu>User’s Full
+      Name</guimenu> field, your login name in the
+      <guimenu>Username</guimenu> field, and your password in the
+      <guimenu>Password</guimenu> field.
+     </para>
+     <para>
+      For security reasons, your password should be at least eight
+      characters long and should contain uppercase and lowercase letters and
+      numbers. Passwords are case-sensitive.
+     </para>
+     <para>
+      By default, the password you enter here is also used for the system
+      administrator, <systemitem class="username">root</systemitem>. Uncheck <guimenu>Use this password for
+      system administrator</guimenu> if you prefer
+      to specify a different password for <systemitem class="username">root</systemitem> in the next step.
+     </para>
+     <para>
+      With automatic login enabled, the system boots straight to your
+      desktop with no authentication at all. If you store sensitive data on
+      your system, you should not enable this option as long as the computer
+      can also be accessed by others.
+     </para>
+     <para>
+       Proceed with <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_root.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_root.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Type a password for the system administrator account (called the
+      <systemitem class="username">root</systemitem> user). This step is skipped in case you had activated
+      <guimenu>Use this Password for System Administrator</guimenu> in the
+      previous step.
+     </para>
+     <para>
+      You should never forget the <systemitem>root</systemitem> password.
+      After you enter it here, the password cannot be retrieved. It can only
+      be reset with administrative assistance. Proceed with
+      <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_summary.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_summary.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Use the Installation Settings screen to review your choices as well as
+      some automatically proposed settings. If necessary, change the
+      settings.
+     </para>
+     <para>
+      Click <guimenu>Install</guimenu> to proceed. Depending on your
+      software selection you may have to accept additional license
+      agreements by clicking <guimenu>Accept</guimenu>. Before the actual
+      installation starts you will see the following screen:
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_confirm.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_confirm.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Click <guimenu>Install</guimenu> to start the installation.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_perform.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_perform.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      The installation usually takes between 15 and 30 minutes, depending on
+      the system performance and the selected software scope. During the
+      installation you may either view the product presentation, the release
+      notes containing last-minute information, or the detailed installation
+      log.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_config.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_config.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      After completing the installation of all selected software packages
+      and the basic system setup, the <phrase os="osuse">openSUSE</phrase> installation boots into
+      the new Linux system, to perform the automatic system configuration.
+      This routine configures your network and Internet access
+      and sets up your hardware. This process does not need any interaction.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_displaymanager.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_displaymanager.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      If you have chosen the automatic login function, the desktop directly
+      starts. Otherwise you will see the login screen. Select your
+      username, and type your password in the <guimenu>Password</guimenu>
+      field. Press <keycap>Enter</keycap> to log in.
+     </para>
+    </step>
+   </procedure>
+ </sect1>
+</chapter>

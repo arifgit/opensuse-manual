@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<sect1 xml:base="common_intro_available_doc_i.xml">
+ <title>Available Documentation</title><indexterm>
+
+ <primary>help</primary>
+
+ <secondary>Novell/SUSE manuals</secondary></indexterm><indexterm>
+
+ <primary>Novell/SUSE manuals</primary></indexterm>
+
+ <para>
+  We provide HTML and PDF versions of our books in different languages.
+  <phrase os="osuse;sled;sles">The following manuals for users and
+  administrators are available on this product:</phrase>
+ </para>
+
+
+
+ <variablelist>
+  
+  <varlistentry os="osuse">
+   <term><xref linkend="book.opensuse.startup"/>
+   </term>
+   <listitem>
+    <para>
+     Guides you step-by-step through the installation of <phrase os="osuse">openSUSE</phrase> from
+     DVD, or from an ISO image, gives short introductions to the GNOME and
+     KDE desktops including some key applications running on it. Also gives
+     an overview of LibreOffice and its modules for writing texts, working with
+     spreadsheets, or creating graphics and presentations.
+    </para>
+   </listitem>
+  </varlistentry>
+  
+  
+  
+  <varlistentry os="osuse">
+   <term><xref linkend="book.opensuse.reference"/>
+   </term>
+   <listitem>
+    <para>
+     Gives you a general understanding of <phrase os="osuse">openSUSE</phrase> and covers advanced
+     system administration tasks. It is intended mainly for system
+     administrators and home users with basic system administration
+     knowledge. It provides detailed information about advanced deployment
+     scenarios, administration of your system, the interaction of key system
+     components and the set-up of various network and file services
+     <phrase os="osuse">openSUSE</phrase> offers.
+    </para>
+   </listitem>
+  </varlistentry>
+  
+  
+  <varlistentry>
+   <term><xref linkend="book.security"/>
+   </term>
+   <listitem>
+    <para>
+     Introduces basic concepts of system security, covering both local and
+     network security aspects. Shows how to make use of the product inherent
+     security software like AppArmor (which lets you specify per program which
+     files the program may read, write, and execute) or the auditing system
+     that reliably collects information about any security-relevant events.
+    </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term><xref linkend="book.tuning"/>
+   </term>
+   <listitem>
+    <para>
+     An administrator's guide for problem detection, resolution and
+     optimization. Find how to inspect and optimize your system by means of
+     monitoring tools and how to efficiently manage resources. Also contains
+     an overview of common problems and solutions and of additional help and
+     documentation resources.
+    </para>
+   </listitem>
+  </varlistentry>
+  
+  <varlistentry>
+   <term><xref linkend="book.kvm"/>
+   </term>
+   <listitem>
+    <para>
+     This manual offers an introduction to setting up and managing
+     virtualization with KVM (Kernel-based Virtual Machine) on
+     <phrase os="osuse">openSUSE</phrase>. Also shows how to manage VM Guests with <systemitem class="library">libvirt</systemitem> and
+     QEMU.
+    </para>
+   </listitem>
+  </varlistentry>
+  
+ </variablelist>
+
+ 
+
+ 
+
+ <para>
+  Find HTML versions of most product manuals in your installed system under
+  <filename>/usr/share/doc/manual</filename> or in the help centers of your
+  desktop. Find the latest documentation updates at
+  <ulink url="http://www.suse.com/documentation"/> where you can download
+  PDF or HTML versions of the manuals for your product.
+ </para>
+
+
+
+ 
+
+ 
+
+ 
+</sect1>

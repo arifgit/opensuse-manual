@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<sect1 xml:base="common_intro_acknowl_i.xml">
+ <title>Acknowledgments</title>
+
+ <para>
+  With a lot of voluntary commitment, the developers of Linux cooperate on a
+  global scale to promote the development of Linux. We thank them for their
+  efforts—this distribution would not exist without them. Furthermore,
+  we thank Frank Zappa and Pawar. Special thanks, of course, goes to Linus
+  Torvalds.
+ </para>
+
+ <para>
+  Have a lot of fun!
+ </para>
+
+ <para>
+  Your SUSE Team
+ </para>
+</sect1>

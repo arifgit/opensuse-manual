@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="apparmor_intro.xml" id="cha.apparmor.intro">
+ <title>Mengenal AppArmor</title>
+ <para>
+  Banyak kerentanan keamanan yang disebabkan oleh bug pada program
+  <emphasis>terpercaya</emphasis>. Sebuah program berjalan dengan hak akses dan penyerang ingin memilikinya. Program ini menjadi tidak aman lagi jika memiliki bug yang memungkinkan penyerang untuk mendapatkan hak istimewa.
+ </para>
+ <para>
+  AppArmor® adalah sebuah aplikasi untuk masalah keamanan yang dirancang khusus dengan memberikan hak kepada administrator untuk menindak program yang mencurigai. AppArmor memungkinkan administrator untuk mengetahui wilayah dari aktivitas yang dapat dilakukan program dan administrator dapat mengembangkan <emphasis>profil</emphasis> keamanan untuk aplikasi tersebut
+  (sebuah daftar file yang dapat diakses dan dijalankan program). AppArmor mengamankan aplikasi dengan <emphasis>meluruskan</emphasis> perilaku aplikasi tanpa mengandalkan tanda tangan serangan, sehingga mampu mencegah serangan bahkan jika kerentanan yang sebelumnya tidak diketahui sedang mengalami eksploitasi.
+ </para>
+ <para>
+  AppArmor terdiri dari:
+ </para>
+ <itemizedlist mark="bullet" spacing="normal">
+  <listitem>
+   <para>
+    Sebuah pustaka profil AppArmor untuk aplikasi Linux* umum, menggambarkan apa file program yang dibutuhkan untuk akses.
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    Sebuah pustaka profil AppArmor tingkat dasar yang diperlukan untuk kegiatan aplikasi pada umumnya, seperti lookup DNS dan otentikasi pengguna.
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    Seperangkat alat untuk mengembangkan dan meningkatkan profil AppArmor, sehingga anda dapat mengubah profil yang ada sesuai dengan kebutuhan anda dan membuat profil baru untuk aplikasi lokal ataupun membuat kustom sesuai keinginan anda sendiri.
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    Beberapa aplikasi dimodifikasi khusus yang diaktifkan AppArmor untuk memberikan keamanan yang lebih dalam bentuk subprosess terkurung yang unik (termasuk Apache dan Tomcat).
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    Modul kernel AppArmor–loadable dan skrip kontrol yang terpadu untuk melaksanakan ketentuan AppArmor pada sistem
+    <phrase os="sles;sled;osuse"><phrase os="osuse">openSUSE®</phrase></phrase> anda.
+   </para>
+  </listitem>
+ </itemizedlist>
+ <sect1 id="sec.apparmor.intro.background">
+  <title>Informasi Latar Belakang mengenai AppArmor Profiling</title>
+
+  <para>
+   Untuk informasi lebih lanjut tentang pengetahuan dan keamanan Novell AppArmor, baca karya tulis berikut:
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term><citetitle>SubDomain: Parsimonious Server Security</citetitle> Oleh Crispin Cowan, Steve Beattie,
+     Greg Kroah-Hartman, Calton Pu, Perry Wagle, dan Virgil Gligor</term>
+    <listitem>
+     <para>
+      Menjelaskan perancangan awal dan implementasi Novell AppArmor. Diterbitkan dalam Diterbitkan dalam acara kerja USENIX LISA Conference, December 2000, New
+      Orleans, LA. Tulisan ini sekarang sudah kadaluarsa. Sintaks dan fitur  sudah berbeda dengan AppArmor saat ini. Tulisan ini digunakan hanya untuk latar belakang saja, dan bukan untuk dokumentasi teknis.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><citetitle>Defcon Capture the Flag: Defending Vulnerable Code from Intense Attack</citetitle>
+     oleh Crispin Cowan, Seth Arnold, Steve Beattie, Chris Wright, dan John Viega</term>
+    <listitem>
+     <para>
+      Sebuah panduan yang baik untuk penggunaan strategi dan taktis dari Novell AppArmor untuk memecahkan masalah keamanan yang parah dalam waktu yang sangat singkat. Telah diterbitkan dalam
+      Proceedings of the DARPA Information Survivability Conference dan Expo
+      (DISCEX III), April 2003, Washington, DC.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><citetitle>AppArmor for Geeks</citetitle> oleh Seth Arnold</term>
+    <listitem>
+     <para>
+      Dokumen ini membahas konsep dan perancangan AppArmor dari sudut pandang yang sangat teknis. Ini tersedia di
+      <ulink url="http://en.opensuse.org/SDB:AppArmor_geeks"/>.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+</chapter>

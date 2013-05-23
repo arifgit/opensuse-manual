@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1 PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<sect1 xml:base="1_click_install_i.xml" id="sec.y2.sw.1click">
+ <title>1-Click Install</title>
+
+
+
+ <para>
+  Instalasi menggunakan <literal>1-Click Install</literal> juga tersedia pada antarmuka Web. Sebuah antarmuka yang sangat populer, yang dikenal dengan nama software pencarian "openSUSE Build Service".
+ </para>
+
+ <procedure>
+  <title>Instalasi paket menggunakan <literal>1-Click Install</literal> openSUSE Build Service</title>
+  <step performance="required">
+   <para>
+    Mulai antarmuka pencarian openSUSE Build Service di
+    <ulink url="http://software.opensuse.org/search"/>.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Pilih versi sistem anda dari menu drop-down, misalnya
+    <emphasis><phrase os="osuse">openSUSE</phrase> <phrase os="osuse">12.3</phrase></emphasis>.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Masukkan nama paket yang ingin anda instal, misalnya
+    OpenStreetMap editor <systemitem>josm</systemitem>.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Untuk mempersempit pencarian, atur <guimenu>Search Options</guimenu>
+    sesuai keinginan anda.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Klik <guimenu>Search</guimenu>.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Dari daftar hasil yang ditampilkan, pilih item dengan meng-klik tombol <guimenu>1-Click Install</guimenu>.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Pada dialog download di peramban web, pilih untuk membuka file dengan
+    <guimenu>YaST Meta Package Handler</guimenu>.
+   </para>
+   <para>
+    1-click installer akan membuka dialog<guimenu>Additional Software
+    Repositories</guimenu>. Ini akan menunjukkan repositori yang menyediakan paket yang ingin anda instal menggunakan <literal>1-Click Install</literal>.
+    Mereka telah diaktifkan secara default. Untuk melanjutkan instalasi, pertahankan repositori ini. Secara default anda akan tetap berlangganan repositori ini setelah instalasi selesai dan akan menerima update dari mereka nantinya.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Tetapi jika Anda ingin menggunakan repositori baru ini hanya untuk sekali ini saja, hapus centang
+    <guimenu>Remain Subscribed to These Repositories after
+    Installation</guimenu>. Klik <guimenu>Next</guimenu> untuk melanjutkan.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Sekarang pilih paket software yang harus diinstal. Biasanya tidak perlu untuk mengubah pilihan default. klik
+    <guimenu>Next</guimenu> untuk melanjutkan.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Layar <guimenu>Proposal</guimenu> akan menampilkan ringkasan pilihan yang telah anda buat.
+    Klik <guimenu>Customize</guimenu> untuk memulai kembali langkah-langkah konfigurasi dari atas. Klik <guimenu>Next</guimenu> dan <guimenu>Yes</guimenu> untuk meneruskan dengan proses instalasi.
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Masukkan kata sandi <systemitem class="username">root</systemitem> untuk memulai proses instalasi. Repositori baru yang telah ditambahkan sebelumnya membutuhkan anda untuk mengkonfirmasi untuk impor kunci GPG repositori. Selama beberapa proses instalasi pop-up akan muncul yang tidak memerlukan tindakan apapun. Setelah muncul pesan
+    <quote>Installation was successful</quote>, klik
+    <guimenu>Finish</guimenu>.
+   </para>
+  </step>
+ </procedure>
+
+ <tip>
+  <title>Menonaktifkan fitur 1-Click Install</title>
+
+  <para>
+   Jika anda ingin menonaktifkan fitur 1-Click install, hapus paket yang bernama
+   <systemitem>yast2-metapackage-handler</systemitem> menggunakan YaST.
+   Atau masukkan perintah berikut sebagai <systemitem class="username">root</systemitem>:
+  </para>
+<screen>rpm -e yast2-metapackage-handler</screen>
+ </tip>
+</sect1>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="advanced_disksetup.xml" id="cha.advdisk">
+ <title>Pengaturan Disk Lanjutan</title>
+ <para>
+  Konfigurasi sistem yang canggih memerlukan pengaturan disk yang lebih spesifik. Semua tugas mempartisi umum dapat dilakukan dengan menggunakan YaST. Untuk mendapatkan penamaan perangkat persisten dengan perangkat blok, gunakan perangkat blok seperti dibawah
+  <filename>/dev/disk/by-id</filename> or
+  <filename>/dev/disk/by-uuid</filename>. Logical Volume Management (LVM) adalah skema mempartisi disk yang dirancang untuk menjadi jauh lebih fleksibel daripada mempartisi fisik yang biasa digunakan dalam pengaturan standar. Gambaran fungsi yang memungkinkan penciptaan kemudahan dalam malakukan backup data. RAID (singkatan dari Redundant Array of Independent Disks) menawarkan peningkatan integritas data, kinerja, dan meminimalkan tingkat kesalahan. <phrase os="osuse">openSUSE</phrase> juga mendukung multipath I/O
+  , serta ada juga pilihan untuk menggunakan iSCSI sebagai disk jaringan.
+ </para>
+
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="yast2_manpart.xml" parse="xml"/>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="lvm.xml" parse="xml"/>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="raid.xml" parse="xml"/>
+</chapter>

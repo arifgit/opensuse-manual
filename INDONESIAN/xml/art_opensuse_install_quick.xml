@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<chapter xml:base="art_opensuse_install_quick.xml" id="art.osuse.installquick">
+ <title>Memulai Instalasi Cepat</title>
+ <abstract>
+  <para>
+   Gunakan langkah-langkah berikut untuk menginstal versi baru dari <phrase os="osuse">openSUSE®</phrase>
+   <phrase os="osuse">12.3</phrase>. Dokumen ini memberikan gambaran singkat tentang bagaimana menjalankan menggunakan instalasi standar <phrase os="osuse">openSUSE</phrase>.
+  </para>
+ </abstract> 
+ <sect1 id="sec.osuse.installquick">
+  <title>Welcome to <phrase os="osuse">openSUSE</phrase></title>
+
+  <para>
+   Untuk petunjuk instalasi yang lebih rinci dan strategi penerapan,
+   lihat dokumentasi <phrase os="osuse">openSUSE</phrase> pada
+   <ulink url="http://doc.opensuse.org/"/>.
+  </para>
+ </sect1>
+
+  <sect1 id="sec.osuse.installquick.sysreqs">
+   <title>Persyaratan Sistem</title>
+   <itemizedlist mark="check" spacing="normal">
+    <listitem>
+     <para>
+      Pentium* III 500 MHz atau processor yang lebih tinggi (disarankan Pentium 4 2.4 GHz keatas atau
+      prosesor AMD64 or Intel* EM64T)
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      RAM 512 MB (disarankan 1 GB)
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Tersedia ruang disk 3 GB atau lebih
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Resolusi layar 800 x 600 (1024 x 768 atau yang lebih tinggi)
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect1>
+
+  <sect1 id="sec.osuse.installquick.install">
+   <title>Melakukan Instalasi <phrase os="osuse">openSUSE</phrase></title>
+   <para>
+    Gunakan petunjuk berikut jika tidak ada sistem Linux pada mesin komputer anda, atau jika anda ingin mengganti sistem Linux yang sudah ada.
+   </para>
+<?dbfo-need height="10em"?>
+
+   <procedure>
+    <step performance="required">
+     <para>
+      Masukkan DVD <phrase os="osuse">openSUSE</phrase> ke dalam drive, kemudian reboot komputer untuk memulai tahap instalasi.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_boot.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_boot.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Pilih <guimenu>Installation</guimenu> pada tampilan boot dan tekan
+      <keycap>Enter</keycap>. Ini akan memuat proses instalasi <phrase os="osuse">openSUSE</phrase> dan akan memlai tahap instalasi normal
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_welcome.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_welcome.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Pilih bahasa dan layout keyboard yang akan digunakan selama instalasi dan untuk sistem yang terinstal.
+     </para>
+     <para>
+      Baca License Agreement lanjutkan dengan <guimenu>Next</guimenu> jika anda setuju. Jika tidak setuju, tekan <guimenu>Abort</guimenu> untuk membatalkan proses instalasi.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_mode.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_mode.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Pilih <guimenu>New Installation</guimenu> dan lanjutkan dengan
+      <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_timezone.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_timezone.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Bisa menggunakan peta atau menu drop-down untuk menentukan
+      <guimenu>Region</guimenu> dan <guimenu>Time Zone</guimenu> untuk mementukan jam dan zona waktu yang akan digunakan pada sistem ini. Lanjutkan dengan
+      <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_sys_type.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_sys_type.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Pilih desktop ingin anda gunakan.
+      <guimenu>KDE</guimenu> dan <guimenu>GNOME</guimenu> memiliki lingkungan desktop yang powerful, dengan KDE hampir mirip dengan tampilan Windows.
+      Anternatif lain juga tersedia ketika anda memilih <guimenu>Other</guimenu>.
+      Lanjutkan dengan <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_partitioning.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_partitioning.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Tentukan pengaturan partisi <phrase os="osuse">openSUSE</phrase> pada langkah ini. Biasanya pada kasus yang wajar, anda bisa menggunakan pengaturan yang sudah diusulkan sistem tanpa melakukan perubahan lagi.
+      Terima usulan tersebut dengan <guimenu>Next</guimenu> dan lanjutkan dengan proses instalasi. Untuk pengguna berpengalaman juga dapat menyesuaikan usulan
+      (<guimenu>Edit Partition Setup</guimenu>) atau menerapkan skema partisi mereka sendiri (<guimenu>Create Partition Setup</guimenu>).
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_user.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_user.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Ketik nama lengkap anda pada <guimenu>User’s Full
+      Name</guimenu>, nama login pada
+      <guimenu>Username</guimenu>, dan kata sandi pada
+      <guimenu>Password</guimenu>.
+     </para>
+     <para>
+      Untuk alasan keamanan, sandi anda harus setidaknya delapan karakter dan harus berisi huruf besar dan huruf kecil dan angka. Kata sandi bersifat case-sensitive (huruf besar dan huruf kecil dianggap berbeda).
+     </para>
+     <para>
+      Secara default, kata sandi yang anda masukkan di sini juga digunakan untuk administrator sistem, <systemitem class="username">root</systemitem>. Hilangkan tanda centang <guimenu>Use this password for
+      system administrator</guimenu> jika anda memilih untuk menentukan kata sandi yang berbeda untuk <systemitem class="username">root</systemitem> pada langkah selanjutnya.
+     </para>
+     <para>
+      Dengan login otomatis diaktifkan, sistem boot langsung ke desktop Anda tanpa otentikasi sama sekali. Jika anda menyimpan data sensitif pada sistem atau komputer ini juga diakses oleh orang lain, anda tidak perlu mengaktifkan opsi ini.
+     </para>
+     <para>
+       Lanjutkan <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_root.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_root.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Ketik kata sandi untuk account administrator sistem (disebut juga pengguna <systemitem class="username">root</systemitem>). Tahap ini tidak ada jika anda mengaktifkan
+      <guimenu>Use this Password for System Administrator</guimenu> pada langkah sebelumnya.
+     </para>
+     <para>
+      Anda tidak boleh lupa kata sandi <systemitem>root</systemitem>.
+      Setelah anda masukkan di sini, kata sandi tidak dapat diatur ulang disini. Ia hanya dapat diatur ulang dengan administrative assistance. lanjutkan dengan
+      <guimenu>Next</guimenu>.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_summary.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_summary.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Gunakan layar Pengaturan Instalasi untuk meninjau pilihan anda serta beberapa pengaturan secara otomatis diusulkan. Jika diperlukan, anda dapat mengubah pengaturan.
+     </para>
+     <para>
+      Klik <guimenu>Install</guimenu> untuk melanjutkan. Tergantung pada pemilihan perangkat lunak, anda mungkin harus menerima perjanjian lisensi tambahan dengan mengklik <guimenu>Accept</guimenu>. Sebelum instalasi yang sebenarnya akan dimulai anda akan melihat layar berikut:
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_confirm.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_confirm.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Klik <guimenu>Install</guimenu> untuk memulai instalasi.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_perform.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_perform.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Instalasi biasanya membutuhkan waktu antara 15 dan 30 menit. Lamanya instalasi tergantung pada kinerja sistem dan software yang dipilih. Selama instalasi anda mungkin baiknya melihat presentasi produk, catatan rilis terakhir atau rincian log instalasi.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_y2_inst_config.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_y2_inst_config.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Setelah menyelesaikan proses instalasi dari semua software yang dipilih, proses instalasi <phrase os="osuse">openSUSE</phrase> akan melakukan booting ke sistem Linux yang baru untuk melakukan konfigurasi sistem secara otomatis. Ini bertujuan untuk mengkonfigurasi jaringan dan akses Internet serta mengatur hardware Anda. Proses ini tidak membutuhkan interaksi apapun.
+     </para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="i_displaymanager.png" width="75%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="i_displaymanager.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+    </step>
+    <step performance="required">
+     <para>
+      Jika anda telah memilih fungsi login otomatis sebelumnya, desktop akan langsung dimulai. Jika tidak, anda akan melihat layar login. Pilih nama pengguna dan ketikkan kata sandi anda pada bidang <guimenu>Password</guimenu>. Tekan <keycap>Enter</keycap> untuk masuk.
+     </para>
+    </step>
+   </procedure>
+ </sect1>
+</chapter>

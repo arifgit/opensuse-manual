@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="tuning_kexec.xml" id="cha.tuning.kexec">
+ <title>kexec dan kdump</title>
+ <para>
+  kexec merupakan alat untuk boot pada kernel lain dari kernel yang berjalan.
+  Anda dapat melakukan sistem reboot yang lebih cepat tanpa inisialisasi
+  perangkat keras. Anda juga dapat menyiapkan sistem untuk boot ke kernel
+  lain jika terjadi sistem crash.
+ </para>
+ <sect1 id="cha.tuning.kexec.intro">
+  <title>Pendahuluan</title>
+
+  <para>
+   Dengan kexec, anda dapat mengganti kernel yang berjalan dengan kernel lain
+   tanpa reboot perangkat keras. Alat ini berfungsi untuk beberapa alasan:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     Reboot sistem yang lebih cepat
+    </para>
+    <para>
+     Jika anda sering membutuhkan reboot sistem, kecex dapata menghemat
+     waktu anda dengan signifikan.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Menghindari firmware dan hardware yang tidak terjamin
+    </para>
+    <para>
+     Perangkat keras komputer merupakan permasalahan serius dan kompleks yang
+     mungkin ditemui saat start-up sistem. Anda tidak selalu bisa mengganti 
+     perangkat keras secepatnya. kexec mem-boot kernel pada lingkungan yang
+     terkontrol dengan perangkat keras yang sudah diinisialisasi. Resiko dari
+     start sistem yang tak terlalu berhasil bisa diminimalisasi.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Menyelamatkan dump dari kernel yang crash
+    </para>
+    <para>
+     kexec memelihara konten dari memori fisik. Setelah kernel <emphasis>produksi</emphasis>
+     gagal, kernel <emphasis>cadangan</emphasis> (sebuah tambahan kernel yang berjalan
+     pada daerah memori yang terjaga) menyimpan kondisi dari kernel
+     yang gagal. Citra yang tersimpan dapat digunakan untuk analisis
+     selanjutnya.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Boot tanpa menggunakan konfigurasi GRUB atau LILO
+    </para>
+    <para>
+     Ketika sistem mem-boot kernel dengan kexec, sistem melewati tahap
+     boot loader. Prosedur boot yang normal dapat gagal karena galat pada
+     konfigurasi boot loader. Dengan kexec, anda tidak tergantung pada konfigurasi
+     boot loader.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <sect1 id="cha.tuning.kexec.pkgs">
+  <title>Paket yang Dibutuhkan</title>
+
+  <para>
+   Jika anda berniat menggunakan kexec pada <phrase os="osuse">openSUSE</phrase> untuk mempercepat
+   reboot atau menghindari masalah perangkat keras, anda harus menginstall paket
+   <systemitem>kexec-tools</systemitem>. Paket ini berisi skrip yang memanggil
+   <command>kexec-bootloader</command>, yang membaca konfigurasi boot loader
+   dan menjalankan kexec dengan opsi yang sama dengan boot loader lakukan. <command>kexec-bootloader <option>-h</option></command>
+   memberi anda daftar opsi yang mungkin.
+  </para>
+
+  <para>
+   Untuk mengatur lingkungan yang membantu anda mendapatkan informasi debug
+   yang berguna jika terjadi crash kernel, anda harus menginstall <systemitem>makedumpfile</systemitem>
+   untuk tambahan.
+  </para>
+
+  <para>
+   Metode yang biasa dipilih untuk menggunakan kdum pada <phrase os="osuse">openSUSE</pharse>
+   adalah menggunakan modul kdum YaST. Pasang paket <literal>yast2-kdump</literal>
+   dengan memasukkan perintah <command>zypper install yast2-kdump</command> pada
+   baris perintah sebagai <systemitem class="username">root</systemitem>.
+  </para>
+ </sect1>
+ <sect1 id="cha.tuning.kexec.internals">
+  <title>Internal kexec </title>
+
+  <para>
+   Komponen yang paling penting dari kexec adalah perintah <filename>/sbin/kexec</filename>.
+   Anda dapat memult kernel dengan kexec dalam dua cara:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     <command>kexec <option>-l</option>
+     <replaceable>kernel_image</replaceable> </command> loads the kernel to
+     the address space of a production kernel for a regular reboot. You can
+     later boot to this kernel with <command>kexec
+     <option>-e</option></command>.
+     <command>kexec <option>-l</option>
+     <replaceable>kernel_image</replaceable> </command> memuat kernel ke
+     ruang kernel produksi untuk reboot biasa. Anda dapat mem-boot kernel ini nanti
+     dengan perintah <command>kexec <option>-l</option></command>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <command>kexec <option>-p</option>
+     <replaceable>kernel_image</replaceable> </command> memuat kernel ke ruang memori yang disediakan
+     Kernel akan di-boot otomatis ketika terjadi crash sistem.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Jika anda ingin mem-boot kernel lain dan menyimpan data pada kernel
+   produksi saat sistem crash, anda harus menyiapkan bagian pada memori sistem.
+   Kernel produksi tidak pernah termuat pada area ini karena harus selalu tersedia.
+   Daerah ini digunakan untuk kernel penangkap sehingga memori pages pada kernel
+   produksi dapat disimpan. Adna menyimpan ruang denan <option>crashkernel</option> =
+   <replaceable>size@offset</replaceable> sebagai parameter pada kernel produksi.
+   Harap dicatat bahwa kernel tidak menggunakan kexec sama sekali.
+  </para>
+
+  <para>
+   Kernel yang ditangkap dimuat ke ruang yang disediakan dan menunggu untuk
+   kernel produksi crash. Lalu kdump mencoba untuk mengikutkan kernel penangkap
+   karena kernel produksi tidak lagi bisa digunakan pada tahap ini. Hal ini
+   berarti bahwa kdump-pun bisa gagal.
+  </para>
+
+  <para>
+   Untuk memuat kernel penangkap, anda harus menambahi parameter boot kernel.
+   Biasanya, sistem berkas RAM inisial yang digunakan untuk mem-boot.
+   Anda dapat menyepesifikkan dengan <option>--initrd</option> = <replaceable>sistemberkas</replaceable>.
+   Dengan <option>--append</option> = <replaceable>cmdline</replaceable>, anda menambahkan opsi
+   pada baris perintah boot kernel. Hal ini berguna untuk mengikutsertakan baris perintah
+   dari kernel produksi jika opsi tersebut penting agar kernel bisa ter-boot.
+   Anda dapat pula hanya menyalin baris perintah dengan <option>--append</option> = <replaceable>"$(cat /proc/cmdline)"</replaceable>
+   atau menambahkan lagi opsi <option>--append</option> = <replaceable>"$(cat /proc/cmdline) more_options"</replaceable> .
+  </para>
+
+  <para>
+   Anda juga bisa selalu melepaskan kernel yang sebelumnya termuat. Untuk melepas
+   kernel yang sudah termuat dapat dilakukan dengan opsi <option>-l</option>, dapat
+   menggunakan perintah <command>kexec </option>-u</option> </command>.
+   Untuk melepas kernel yang cras menggunakan opsi <option>-u</option>, gunakan perintah
+   <command>kexec <option>-p</option> <option>-u</option> </command>.
+  </para>
+ </sect1>
+ <sect1 id="cha.tuning.kexec.basic_usage">
+  <title>Penggunaan Dasar kexec</title>
+
+  <para>
+   Untuk memverifikasi lingkungan kexec anda bekerja dengan benar, lakukan
+   langkah berikut:
+  </para>
+
+  <procedure>
+   <step performance="required">
+    <para>
+     Pastikan tidak ada pengguna yang sedang log in dan tidak ada service
+     penting yang berjalan pada sistem.
+    </para>
+   </step>
+   <step performance="required">
+    <para>
+     Log in sebagai <systemitem class="username">root</systemitem>.
+    </para>
+   </step>
+   <step performance="required">
+    <para>
+     Berpindah dari runlevel 1 dengan perintah <command>telinit <option>1</option> </command>
+    </para>
+   </step>
+   <step id="step.kexec.usage.load.kernel" performance="required">
+    <para>
+     Muat kernel yang baru pada ruang dari kenel produksi dengan perintah berikut:
+    </para>
+    <para>
+     <command>kexec <option>-l</option>
+     <replaceable>/boot/vmlinuz</replaceable>
+     <option>--append</option>=<replaceable>"$(cat
+     /proc/cmdline)"</replaceable>
+     <option>--initrd</option>=<replaceable>/boot/initrd</replaceable>
+     </command>
+    </para>
+   </step>
+   <step performance="required">
+    <para>
+     Lepaskan kaitan semua sistem berkas yang terkait kecuali sistem berkas root dengan
+     <command>umount <option>-a</option> </command>
+    </para>
+    <important>
+     <title>Melepas Kait Sistem Berkas Root</title>
+     <para>
+      Melepas semua sistem berkas biasanya menghasilkan peringatan
+      <literal>device is busy</literal>. Sistem berkas root tidak dapat dilepaskan
+      kaitnya bila sistem berjalan. Abaikan peringatan ini.
+     </para>
+    </important>
+   </step>
+   <step performance="required">
+    <para>
+     Kaitkan ulang sistem berkas dalam mode hanya-baca:
+    </para>
+    <para>
+     <command>mount <option>-o</option> <replaceable>remount,ro
+     /</replaceable></command>
+
+    </para>
+   </step>
+   <step performance="required">
+    <para>
+     Inisialisasi reboot kernel yang anda muat pada
+     <xref linkend="step.kexec.usage.load.kernel"/> dengan  <command>kexec
+     <option>-e</option></command>
+    </para>
+   </step>
+  </procedure>
+
+  <para>
+   Merupakan hal yang penting untuk melepas kait dari volume diska yang sebelumnya
+   dikaitkan dalam mode baca-tulis. System call <systemitem>reboot</systemitem> dilakukan
+   segera setelah pemanggilan. Hard drive dalam mode baca-tulis tidak menyinkronisasi atau
+   melepas kait secara otomatis. Kernel baru mungkin akan mengangga mereka <quote>kotor</quote>.
+   Drive yang hanya-baca dan sistem berkas virtual tidak perlu dilepas kaitnya. Sila
+   acu pada <filename>/etc/mtab</filename> untuk menentukan sistem berkas mana saja
+   yang perlu dilepas kaitnya.
+  </para>
+
+  <para>
+   Kernel baru yang sebelumnya termuat pada ruang kernel lama akan ditulis ulang
+   dan segera mengambil kendali. Kernel ini akan menampilkan pesan start-up biasa.
+   Ketika kernel baru di-boot, kernel akan melewati semua pemeriksaan hardware dan
+   firmware. Pastikan tidak ada pesan peringatan yang muncul. Semua sistem berkas
+   diharuskan untuk bersih sebelum dilepas kaitannya.
+  </para>
+ </sect1>
+ <sect1 id="cha.tuning.kexec.config">
+  <title>How to Configure kexec for Routine Reboots</title>
+  <title>Cara Konfigurasi kexec Untuk Reboot Rutin</title>
+
+  <para>
+   kexec sering digunakan untuk reboot yang acap. Sebagai contoh, reboot
+   membutuhkan waktu yang lama untuk memeriksa apakah hardware atau start-up
+   bisa diandalkan.
+  </para>
+
+  <note>
+   <title>Rebooting with kexec</title>
+   <title>Reboot dengan kexec</title>
+
+   <para>
+    Pada versi <phrase os="osuse">openSuse</phrase> sebelumnya, anda harus menyunting
+    berkas konfigurasi <filename>/etc/sysconfig/shutdown</filename> dan 
+    init script <filename>/etc/init.d/halt</filename> agar menggunakan kexec untuk
+    melakukan boot ulang. Anda tidak lagi harus menyuntin berkas sistem apapun, karena
+    sejak veri 11 sudah dikonfigurasi untuk reboot kexec.
+   </para>
+  </note>
+
+  <para>
+   Harap dicatat bahwa firmware dan boot loader tidak digunakan ketika
+   reboot sistem menggunakan kexec. Setiap perubahan yang anda buat pada
+   konfigurasi boot loader akan diabaikan sampai computer melakukan hard reboot.
+  </para>
+ </sect1>
+ <sect1 id="cha.tuning.kdump.basic">
+
+  <title>Konfigurasi Dasar kdump</title>
+
+  <para>
+   Anda dapat menggunakan kdump untuk menyimpan dump kernel. Jika kernel crash,
+   kernel dump berguna untuk menyimpan citra memori dari lingkungan yang crash ke
+   sistem berkas. Anda dapat men-debug berkas dump untuk mecncari sebab dari kernel
+   cras. Hal ini disebut <quote>core dump</quote> .
+  </para>
+
+  <para>
+   Cara kerja kdump mirip dengan kexec (lihat <xref linkend="cha.tuning.kexec"/>).
+   Kernel penangkap dieksekusi setelah kernel produksi crash. Perbedaannya adalah
+   kexec ngganti kernel produksi dengan kernel penangkap. Sedangkan kdump, anda masih dapat
+   mengakses ruang memori dari kernel produksi yang crash. Anda dapat menyimpan
+   citra tangkapan dari kernel yang crash pada lingkungan kernel kdump.
+  </para>
+
+  <para>
+   Anda juga dapat mengkonfigurasi kdump secara manual atau menggunakan YaST.
+  </para>
+
+  <sect2 id="cha.tuning.kdump.basic.manual">
+   <title>Konfigurasi Manual kdump</title>
+   <para>
+    kdump membaca konfiguarsi dari berkas <filename>/etc/sysconfig/kdump</filename> .
+    Untuk memastikan kdump bekerja pada sistem anda, konfigurasi bawaan kdump sudah cukup.
+    Untuk menggunakan kdump dengan setting bawaan, ikuti langkah berikut:
+   </para>
+   <procedure>
+    <step performance="required">
+     <para>
+      Append the following kernel command line option to your boot loader
+      configuration, and reboot the system:
+      Tambahkan opsi berikut pada baris perintah di konfigurasi kernel boot loader,
+      dan reboot sistem:
+     </para>
+     <para>
+      <literal>crashkernel=</literal><replaceable>size@offset</replaceable>
+     </para>
+     <para>
+      Anda dapat mencari nilai yang sesuai untuk
+      <replaceable>size</replaceable> dan <replaceable>offset</replaceable>
+      pada tabel berikut:
+     </para>
+     <table>
+      <title>Recommended Values for Additional Kernel Command Line Parameters</title>
+      <title>Nilai yang Direkomendasikan untuk Parameter Tambahan Baris Perintah Kernel</title>
+      <tgroup cols="2">
+       <thead>
+        <row>
+         <entry>
+          <para>
+           Arsitektur
+          </para>
+         </entry>
+         <entry>
+          <para>
+           Nilai yang disarankan
+          </para>
+         </entry>
+        </row>
+       </thead>
+       <tbody>
+        <row>
+         <entry>
+          <para>
+           i386 and x86-64
+          </para>
+         </entry>
+         <entry>
+          <simplelist>
+           <member><literal>crashkernel=256M</literal> untuk memori 0 - 12 GB
+           </member>
+           <member><literal>crashkernel=512M</literal> untuk memori 13 - 48 GB
+           </member>
+           <member><literal>crashkernel=1G</literal> untuk memori 49 - 128 GB
+           </member>
+           <member><literal>crashkernel=2G</literal> untuk memori 129 - 256 GB
+           </member> 
+          </simplelist>
+         </entry>
+        </row>
+        <row>
+         <entry>
+          <para>
+           IA64
+          </para>
+         </entry>
+         <entry>
+          <para>
+           crashkernel=256M (sistem kecil) or crashkernel=512M (sistem lebih besar)
+          </para>
+         </entry>
+        </row>
+        <row>
+         <entry>
+          <para>
+           ppc64
+          </para>
+         </entry>
+         <entry>
+          <para>
+           crashkernel=128M@4M atau crashkernel=256M@M4 (sistem lebih besar)
+          </para>
+         </entry>
+        </row>
+       </tbody>
+      </tgroup>
+     </table>
+    </step>
+    <step performance="required">
+     <para>
+      Fungsikan init script kdump:
+     </para>
+     <para>
+      <command>chkconfig <replaceable>boot.kdump</replaceable>
+      <option>on</option></command>
+     </para>
+    </step>
+    <step performance="required">
+     <para>
+      Anda dapat menyunting opsi pada <filesystem>/etc/sysconfig/kdump</filename>.
+      Komentar akan membantu anda memahami makna dari opsi individual.
+     </para>
+    </step>
+    <step performance="required">
+     <para>
+      Jalankan init script <command>rckdump
+      <replaceable>start</replaceable></command>, atau reboot sistem.
+     </para>
+    </step>
+   </procedure>
+   <para>
+    Setelah konfigurasi kdump dengan nilai bawaan, periksa apakah kdump bekerja
+    sebagaimana yang diharapkan. Pastikan tidak ada user yang sedang log ini dan
+    tidak ada service penting yang berjalan pada sistem anda. Lalu ikuti langkah berikut:
+   </para>
+   <procedure>
+    <step performance="required">
+     <para>
+      Berpindah ke runlevel 1 dengan perintah <command>telinit
+      <replaceable>1</replaceable></command>
+     </para>
+    </step>
+    <step performance="required">
+     <para>
+      Lepaskan kaitan semua sistem berkas diska kecuali sistem berkas root dengan 
+      <command>umount <option>-a</option></command>
+     </para>
+    </step>
+    <step performance="required">
+     <para>
+      Kaitkan ulang sistem berkas root dalam mode hanya-baca dengan perintah: <command>mount
+      <option>-o</option> <replaceable>remount,ro /</replaceable></command>
+     </para>
+    </step>
+    <step performance="required">
+     <para>
+      Buat <quote>kernel panic</quote> dengan antar muka <literal>procfs</literal>
+      ke Magic SysRq key:
+     </para>
+     <para>
+      <command>echo <replaceable>c
+      &gt;/proc/sysrq-trigger</replaceable></command>
+     </para>
+    </step>
+   </procedure>
+   <important>
+    <title>Ukuran Dump Kernel</title>
+    <para>
+     Opsi <literal>KDUMP_KEEP_OLD_DUMPS</literal> mengatur jumlah
+     dari dump kernel yang disimpan (default 5). Tanpa pengompresan, ukuran dari
+     sebuah dump dapat mencapai ukuran dari RAM. Pastikan anda mempunyai ruang yang cukup
+     pada partisi <filename>/var</filename> .
+    </para>
+   </important>
+   <para>
+    The capture kernel boots and the crashed kernel memory snapshot is saved
+    Kernel penangkap di-boot dan snapshot memori kernel yang crash disimpan pada
+    sistem berkas. Path yang diberikan pada opsi
+    <literal>KDUMP_SAVEDIR</literal> dan nilai defaultnya
+    <filename>/var/crash</filename>. jika
+    <literal>KDUMP_IMMEDIATE_REBOOT</literal> diset ke
+    <literal>yes</literal> , sistem otomatis melakukan reboot ke kernel produksi.
+    Log ini dan periksa apakah dump sudah dibuat pada
+    <filename>/var/crash</filename>.
+   </para>
+   <warning>
+    <title>Layar Freeze pada Sesi X11</title>
+    <para>
+     Ketika kdump mengambil alih dan anda log in pada sesi X11, layar akan
+     freeze tanpa ada pemberitahuan. Beberapa aktivitas kdump masih
+     bisa terlihat (sebagai contoh, pesan yang kacau dari boot kernel di layar).
+    </para>
+    <para>
+     Jangan me-reset komputer karena kdump selalu butuh waktu untuk menyelesaikan
+     tugasnya.
+    </para>
+   </warning>
+  </sect2>
+
+  <sect2 id="cha.tuning.kdump.basic.yast">
+   <title>YaST Configuration</title>
+   <title>Konfigurasi YaST </title>
+   <para>
+    Untuk mengkonfigurasi kdump dengan YaST, anda haru memasang paket <systemitem>yast2-kdump</systemitems> .
+    Lalu memulai modul <guimenu>Kernel Kdump</guimenu> pada kategori <guimenu>Sistem</guimenu>
+    pada YaST Control Center, atau memasukkan perintah <command>yast2 kdump</command> pada
+    perintah baris sebagai <systemitem class="username">root<systemitem>.
+   </para>
+   <figure id="fig.tuning.kdump.basic.yast.kdump1">
+    <title>YaST2 Kdump Module - Start-Up Page</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="yast2_kdump_startup.png" width="60%" format="PNG"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="yast2_kdump_startup.png" width="70%" format="PNG"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    Pada jendela <guimenu>Start-Up</guimenu>, pilih <guimenu>Enable Kdump</guimenu>.
+    Nilai default untuk memori kdump sudah cukup untuk kebanyakan sistem.
+   </para>
+   <para>
+    Klik <guimenu>Dump Filtering</guimenu> pada panel kiri, dan periksa apakah pages sudah
+    termasuk pada dump. Anda tidak perlu memasukkan konten memori untuk bisa men-debug
+    masalah kernel:
+   </para>
+   <itemizedlist mark="bullet" spacing="normal">
+    <listitem>
+     <para>
+      Pages filled with zero
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Cache pages
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      User data pages
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Free pages
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    Pada jendela <guimenu>Dump Target</guimenu>, pilih jenis dari target dump
+    dan URL tempat anda ingin menyimpan dump tersebut. Jika anda memilih
+    protokol network, semisal FTP atau SSH, anda juga harus memasukkan informasi
+    akses yang relevan.
+   </para>
+   <para>
+    Isi jendela informasi <guimenu>Notifikasi Email</guimenu> jika anda ingin
+    kdump untuk memberitahu anda tentang peristiwa lewat email dan mengkonfirmasi perubahan
+    anda dengan <guimenu>OK</guimenu> setelah tuning kdump pada jendela <guimenu>Pengaturan Lanjutan</guimenu>
+    kdump sudah terkonfigurasi.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1 id="cha.tuning.kdump.analyze">
+  <title>Menganalisis Kernel Dump</title>
+
+  <para>
+   Setelah anda mendapatkan dump kernel, saatnya menganalisis. Berikut beberapa opsi.
+  </para>
+
+  <para>
+   Alat asli yang digunakan untuk menganalisis dump adalah GDB. Anda bahkan dapat menggunakannya
+   ada lingkungan terbaru, walau mempunyai beberapa kekurangan dan batasan:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     GDB tidak didesain secara spesifik untuk mendebug dump kernel.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     GDB tidak mendukung binari ELF64 pada platform 32-bit.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     GDB tidak memahami format selain dump ELF (tidak dapat mendebug dump terkompres)
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Itulah mengapa peralatan <emphasis>crash</emphasis> diimplementasikan.
+   Alat ini menganilisis dump crash dan mendebug sistem yang berjalan.
+   Alat ini menyediakan fungsi spesifik untuk mendebug kernel linux dan 
+   jauh lebih cocok untuk debug lanjutan.
+  </para>
+
+  <para>
+   Jika anda ingin mendebug kernel Linux, anda dapat memasang paket informasi
+   debug. Periksa apakah paket ini sudah terpasang pada sistem anda dengan
+   <command>zypper se kernel | grep debug</command>.
+  </para>
+
+  <important>
+   <title>Repositori untuk Paket dengan Informasi Debug</title>
+   <para>
+    Jika anda menggunakan online update, anda akan menemui
+    paket <quote>debuginfo</quote> pada <literal>*-Debuging-Updates</literal> repositori
+    pemasangan online yang sesuai dengan <phrase os="osuse">openSUSE</phrase> <phrase os="osuse">12.3</phrase>. Gunakan
+    YaST untuk memfungsikan repositori tersebut.
+   </para>
+  </important>
+
+  <para>
+   Untuk membuka dump yang ditangkap sewaktu <literal>crash</literal> pada mesin yang memproduksi
+   dump, gunakan perintah sebagai berikut:
+  </para>
+
+  <para>
+   <command>crash /boot/vmlinux-2.6.32.8-0.1-default.gz
+   /var/crash/2010-04-23-11\:17/vmcore</command>
+  </para>
+
+  <para>
+   Parameter pertama yang merepresentasikan citra kernel. Yang kedua merupakan
+   berkas dump yang ditangkap oleh kdump. Anda dapat mencari berkas ini pada
+   <filename>/var/crash</filename> pada aturan bawaan.
+  </para>
+
+  <sect2 id="cha.tuning.kdump.analyze.binformat">
+   <title>Format Binari Kernel</title>
+   <para>
+    Kernel Linux hadir dalam bentuk Executable and Linkable Format (ELF).
+    Berkas ini biasa disebut <literal>vmlinux</literal> dan dibuat langsung
+    pada saat proses kompilasi. Tidak semua boot loader, terutama pada arsitektur x86 (i386
+    dan x86_64), mendukung binari ELF. Solusi berikut hadir pada arsitektur lain
+    yang didukung oleh <phrase os="osuse">openSUSE®</phrase>.
+   </para>
+   <sect3 id="cha.tuning.kdump.analyze.binformat.x86">
+    <title>x86 (i386 dan x86_64)</title>
+    <para>
+     Kebanyakan karena alasan historis, kernel Linux terdiri dari dua bagian:
+     kernel Linux itu sendiri (<literal>vmlinux</literal>) dan kode pengaturan
+     yang dijalankan oleh boot loader.
+    </para>
+    <para>
+     Dua bagian tersebut dihubungkan pada berkas bernama <filename>bzImage</filename>,
+     yang dapat ditemui pada source tree kernel. Berkas tersebut sekarang disebut
+     <filename>vmlinuz</filename> (perhatikan <literal>z</literal> vs. <literal>x</literal>
+     ) pada paket kernel.
+    </para>
+    <para>
+     Citra ELF tidak pernah digunakan langsung pada x86. Sehingga, paket utama kernel
+     berisi berkas <filename>vmlinux</filename> yang dikompres dalam bentuk <filename>vmlinux.gz</filename>.
+    </para>
+    <para>
+     Sehingga kesimpulannya, paket kernel x86 SUSE mempunyai dua berkas kernel:
+    </para>
+    <itemizedlist mark="bullet" spacing="normal">
+     <listitem>
+      <para>
+       <filename>vmlinuz</filename> yang dieksekusi oleh boot loader.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <filename>vmlinux.gz</filename>, citra ELF yang dikompresi yang
+       dibutuhkan oleh <emphasis>crash</emphasis> dan GDB.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </sect3>
+   <sect3 id="cha.tuning.kdump.analyze.binformat.IA64">
+    <title>IA64</title>
+    <para>
+     Boot loader <systemitem>elilo</systemitem> yang mem-boot kernel Linux
+     pada arsitektur IA64, mendukung pemuatan citra ELF (bahkan yang dikompres sekalipun).
+     Paket kernel IA64 hanya berisi satu berkas bernama <filename>vmlinuz</filename>. Berkas
+     ini mendukung citra ELF. <filename>vmlinuz</filename> pada IA64 sama dengan
+     <filename>vmlinux.gz</filename> pada x86.
+    </para>
+   </sect3>
+   <sect3 id="cha.tuning.kdump.analyze.binformat.ppc">
+    <title>PPC and PPC64</title>
+    <para>
+     Boot loader <systemitem>yaboot</systemitem> pada PPC juga mendukung
+     pemuatan citra ELF, namun bukan yang dikompres. Pada paket kernel PPC,
+     terdapat berkas ELF kernel Linux <filename>vmlinux</filename>.
+     Mengingat <emphasis>crash</emphasis>, PPC merupakan arsitektur yang paling mudah.
+    </para>
+    <para>
+     Jika anda memutuskan untuk menganalisis dump pada mesin lain, anda harus
+     memeriksa arsitektur dari komputer dan bekas lain yang dibutukan untuk debugging.
+    </para>
+    <para>
+     Anda dapat menganalisis dump pada komputer lain jika komputer ini menjalankan sistem
+     Linux dari arsitektur yang sama. Untuk memeriksa kompatibilitas, gunakan
+     perintah <command>uname <option>-i</option></command> pada kedua komputer
+     dan bandingkan hasilnya.
+    </para>
+    <para>
+     Jika anda akan menganalisis dump pada komputer lain, anda juga membutuhkan
+     berkas dari paket <systemitem>kernel</systemitem> dan <systemitem>kernel debug</systemitem>.
+    </para>
+    <procedure>
+     <step performance="required">
+      <para>
+       Letakkan dump kernel, citra kernel dari <filename>/boot</filename>, dan berkas
+       debugging lainnya dari <filename>/usr/lib/debug/boot</filename> pada sebuah
+       direktori kosong.
+      </para>
+     </step>
+     <step performance="required">
+      <para>
+       Sebagai tambahan, salin kernel modul dari <filename>/lib/modules/$(uname -r)/kernel/<filename> dan
+       berkas debug lainnya dari <filename>/usr/lib/debug/lib/modules/$(uname -r)/kernel/</filename>
+       ke subdirektori bernama <filename>modules</filename>.
+      </para>
+     </step>
+     <step performance="required">
+      <para>
+       Pada direktori dump, citra kernel, berkas info dump, dan subdirektori <filename>modules</filename>
+       mulai utilitas crash: <command>crash <replaceable>vmlinux-version vmcore</replaceable></command>.
+      </para>
+     </step>
+    </procedure>
+    <note>
+     <title>Dukungan untuk Citra Kernel</title>
+     <para>
+      Citra kernel yang terkompres (gzip, bukan berkas bzImage) didukung oleh paket
+      SUSE dari crash sejak <phrase os="osuse">openSUSE®</phrase> 11. untuk versi lebih lama,
+      anda harus mengekstrak <filename>vmlinux.gz</filename> (x86) atau <filename>vmlinuz<filename>
+      (IA64) ke <filename>vmlinux</filename>.
+     </para>
+    </note>
+    <para>
+     Tak peduli komputer mana yang anda analisis dump, utilitas crash akan memproduksi
+     keluaran yang mirip dengan ini:
+    </para>
+<screen>grego@bukumerah:~&gt; crash /boot/vmlinux-2.6.32.8-0.1-default.gz
+/var/crash/2010-04-23-11\:17/vmcore
+
+crash 4.0-7.6
+Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008  Red Hat, Inc.
+Copyright (C) 2004, 2005, 2006  IBM Corporation
+Copyright (C) 1999-2006  Hewlett-Packard Co
+Copyright (C) 2005, 2006  Fujitsu Limited
+Copyright (C) 2006, 2007  VA Linux Systems Japan K.K.
+Copyright (C) 2005  NEC Corporation
+Copyright (C) 1999, 2002, 2007  Silicon Graphics, Inc.
+Copyright (C) 1999, 2000, 2001, 2002  Mission Critical Linux, Inc.
+This program is free software, covered by the GNU General Public License,
+and you are welcome to change it and/or distribute copies of it under
+certain conditions.  Enter "help copying" to see the conditions.
+This program has absolutely no warranty.  Enter "help warranty" for details.
+
+GNU gdb 6.1
+Copyright 2004 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "x86_64-unknown-linux-gnu"...
+
+      KERNEL: /boot/vmlinux-2.6.32.8-0.1-default.gz
+   DEBUGINFO: /usr/lib/debug/boot/vmlinux-2.6.32.8-0.1-default.debug
+    DUMPFILE: /var/crash/2009-04-23-11:17/vmcore
+        CPUS: 2
+        DATE: Thu Apr 23 13:17:01 2010
+      UPTIME: 00:10:41
+LOAD AVERAGE: 0.01, 0.09, 0.09
+       TASKS: 42
+    NODENAME: eros
+     RELEASE: 2.6.32.8-0.1-default
+     VERSION: #1 SMP 2010-03-31 14:50:44 +0200
+     MACHINE: x86_64  (2999 Mhz)
+      MEMORY: 1 GB
+       PANIC: "SysRq : Trigger a crashdump"
+         PID: 9446
+     COMMAND: "bash"
+        TASK: ffff88003a57c3c0  [THREAD_INFO: ffff880037168000]
+         CPU: 1
+       STATE: TASK_RUNNING (SYSRQ)
+crash&gt;</screen>
+    <para>
+     Keluaran dari perintah mencetak data yang berguna: ada 42 tugas yang berjalan
+     pada saat terjadinya crash kernel. Penyebab crash adalah SysRq trigger yang dijalankan
+     oleh tugas dengan PID 9446. Tugas ini merupakan proses Bash karena <command>echo</command>
+     digunakan untuk perintah internal shell Bash.
+    </para>
+    <para>
+     Utilitas <emphasis>crash</emphasis> dibangun dari GDB dan menyediakan banyak perintah
+     tambahan yang berguna. Jika Anda memasukkan <command>bt</command>
+     tanpa parameter apapun, backtrace dari tugas yang berjalan saat crash
+     akan tercetak:
+    </para>
+<screen>
+crash&gt; bt
+PID: 9446   TASK: ffff88003a57c3c0  CPU: 1   COMMAND: "bash"
+ #0 [ffff880037169db0] crash_kexec at ffffffff80268fd6
+ #1 [ffff880037169e80] __handle_sysrq at ffffffff803d50ed
+ #2 [ffff880037169ec0] write_sysrq_trigger at ffffffff802f6fc5
+ #3 [ffff880037169ed0] proc_reg_write at ffffffff802f068b
+ #4 [ffff880037169f10] vfs_write at ffffffff802b1aba
+ #5 [ffff880037169f40] sys_write at ffffffff802b1c1f
+ #6 [ffff880037169f80] system_call_fastpath at ffffffff8020bfbb
+    RIP: 00007fa958991f60  RSP: 00007fff61330390  RFLAGS: 00010246
+    RAX: 0000000000000001  RBX: ffffffff8020bfbb  RCX: 0000000000000001
+    RDX: 0000000000000002  RSI: 00007fa959284000  RDI: 0000000000000001
+    RBP: 0000000000000002   R8: 00007fa9592516f0   R9: 00007fa958c209c0
+    R10: 00007fa958c209c0  R11: 0000000000000246  R12: 00007fa958c1f780
+    R13: 00007fa959284000  R14: 0000000000000002  R15: 00000000595569d0
+    ORIG_RAX: 0000000000000001  CS: 0033  SS: 002b
+crash&gt;
+</screen>
+    <para>
+     Sekarang sudah jelas apa yang terjadi: Perintah internal <command>echo</command>
+     dari shell Bash mengirim sebuah karakter ke
+     <filename>/proc/sysrq-trigger</filename>. Setelah handler yang berhubungan
+     mengenali karakter ini, handler tersebut memulai fungsi <literal>crash_kexec()</literal>.
+     Fungsi ini disebut <literal>panic()</literal> dan kdump menyimpan sebuah dump.
+    </para>
+    <para>
+     Sebagai tambahan pada perintah dasar GDB dan sebuah versi tambahan dari
+     <command>bt</command>, utilitas crash mendefinisi banyak perintah lain
+     yang berhubungan dengan struktur dari kernel Linux. Perintah ini 
+     memahami struktur data internal dari kernle Linux dan memberikan konten
+     mereka dalam format yang dapat dibaca manusia. Sebagai contoh, anda dapat
+     melihat daftar yang berjalan saat terjadinya crash dengan perintah <command>ps</command>.
+     Dengan <command>sym</comman>, anda dapat melihat daftar dari semua simbol kernel
+     sesuai dengan alamatnya, atau menuliskan simbol individual untuk nilainya.
+     Dengan perintah <command>files</comman>, anda dapat menampilkan semua
+     berkas deskriptor dari sebuah proses. Dengan <command>kmem</command>, anda dapat
+     menampilkan detail dari penggunaan memori kernel. Dengan <command>vm</command>, anda
+     dapat menginspeksi memori virtual dari sebuah proses, bahkan pada tingkatan mapping page individual.
+     Daftar dari perintah yang berguna sangat panjang dan banyak dari perintah ini menerima opsi yang banyak.
+    </para>
+    <para>
+     Perintah yang kami sebutkan diatas mencermikan fungsioanlitas dari perintah
+     Linux umum, seperti <command>ps</command> dan <command>lsof</commad>. Jika
+     anda ingin mengetahui urutan peristiwa dengan debugger, anda harus tahu cara
+     penggunaan GDB dan mempunyai keahlian debugging yang kuat. Keduanya diluar
+     cakupan dari dokumen ini. Sebagai tambahan, anda harus memahami kernel Linux.
+     Beberapa referensi sumber informasi diberikan pada akhir dokumen ini.
+    </para>
+   </sect3>
+  </sect2>
+ </sect1>
+ <sect1 id="cha.tuning.kdump.advanced">
+  <title>Advanced kdump Configuration</title>
+
+  <para>
+   Konfigurasi untuk kdump disimpan pada <filename>/etc/sysconfig/kdump</filename>.
+   Anda dapat menggunakan YaST untuk mengkonfigurasinya. Opsi konfigurasi kdump tersedia
+   pada <menucoice><guimenu>System</guimenu> <guimenu>Kernel Kdump</guimenu></menuchoice> pada
+   YaST Control Center. Berikut merupakan opsi kdump yang mungkin berguna untuk anda:
+  </para>
+
+  <para>
+   Anda dapat mengubah direktori untuk dump kernel dengan opsi <option>KDUMP_SAVEDIR</option>.
+   Harap diperhatikan bahwa ukuran dump kernel bisa sangat besar. kdump akan menolak untuk menyimpan dump
+   bila ruang bebas diska, dikurangi dengan ukuran perkiraan dump, turun dibawah nilai
+   yang ditentukan pada opsi <option>KDUMP_FREE_DISK_SIZE</option>.
+   Perhatikan bahwa KDUMP_SAVEDIR paham format URL
+   <replaceable>protocol://spesifikasi</replaceable>, dimana
+   <replaceable>protocol</replaceable> merupakan salah satu dari <option>file</option>,
+   <option>ftp</option>, <option>sftp</option>, <option>nfs</option> atau
+   <option>cifs</option>, dan <option>spesifikasi</option> berbeda beda untuk tiap protokol
+   Sebagai Contoh, untuk menyimpan dump kernel pada server FTP, gunakan url berikut sebagai template
+   <option>ftp://username:password@ftp.example.com:123/var/crash</option>.
+  </para>
+
+  <para>
+   Dump kernel biasanya besar dan mengandung banyak page yang tidak perlu untuk
+   analisis. Dengan opsi <literal>KDUMP_DUMPLEVEL</literal>, anda dapat membatasi
+   page tesebut. Opsi memahami nilai angka dari 0 sampai 31. Jika anda menspesifikkan
+   <replaceable>0</replaceable>, maka ukuran dump akan menjadi paling besar. Jika anda
+   menspesifikasi <replaceable>31</replaceable>, kdump akan memproduksi dump paling kecil.
+   untuk tabel lengkap tentang nilai yang tersedia, sila lihat laman manual untuk
+   <command>kdump</command> (<command>man 7 kdump</command>).
+  </para>
+
+  <para>
+   Kadang sangat berguna bila ukuran dump kernel semakin kecil. Misal, anda ingin
+   memindah dump melalui jaringan, atau anda ingin menyimpan rang diska pada direktori
+   dump. Hal ini dapat dilakukan dengan mengatur <literal>KDUMP_DUMPFORMAT</literal>
+   ke <replaceable>compressed</replaceable>. Utilitas <command>crash</command> mendukung
+   dekompresi dinamis dengan dump yang dikompres.
+  </para>
+
+  <important>
+   <title>Perubahan pada Berkas Konfigurasi kdump</title>
+   <para>
+    Anda harus selalu mengeksekusi <command>rckdump restart</command> setelah anda
+    membuat perubahan manual pada <filename>/etc/sysconfig/kdump</filename>.
+    Jika tidak, perubahan akan tampak setelah anda melakukan reboot sistem.
+   </para>
+  </important>
+ </sect1>
+ <sect1 id="cha.tuning.kdump.moreinfo">
+  <title>Untuk Informasi Tambahan</title>
+
+  <para>
+   Karena tak ada sebuah referensi komprehensif untuk penggunaan kexec dan kdump,
+   anda harus mengeksplorasi beberapa resource untuk mendapatkan informasi
+   yang anda butuhkan. Beberapa darinya adalah:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     Untuk penggunaan utilitas kexec, lihat laman manual dari
+     <command>kexec</command> (<command>man 8 kexec</command>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Anda dapat melihat informasi umum mengenai kexec pada
+     <ulink url="http://www.ibm.com/developerworks/linux/library/l-kexec.html"/>
+     . Mungkin sedikit ketinggalan jaman.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Untuk detail lebih lanjut pada kdump spesifik ke SUSE Linux, lihat
+     <ulink url="http://ftp.suse.com/pub/people/tiwai/kdump-training/kdump-training.pdf"/>
+     .
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Sebuah deskripsi mendalam dari internal kdump dapat ditemukan pada
+     <ulink url="http://lse.sourceforge.net/kdump/documentation/ols2oo5-kdump-paper.pdf"/>
+     .
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Untuk detail lebih pada <emphasis>crash</emphasis> dump analisis dan
+   tool debugging, gunakan resource berikut:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     Sebagai tambahan untuk laman info dari GDB (<command>info gdb</command>), anda
+     mungkin mau membaca panduan pada
+     <ulink url="http://sourceware.org/gdb/documentation/"/> .
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Sebuah kertas putih dengan deskripsi yang komprehensif dari penggunaan utilitas
+     crash dapat ditemui pada
+     <ulink url="http://people.redhat.com/anderson/crash_whitepaper/"/>
+     .
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Utilitas crash juga mempunyai fitur bantuan online komprehensi. Tinggal
+     ketikkan <command>help <replaceable>command</replaceable></command> untuk
+     menampilkan bantuan online untuk <command>command</command>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Jika anda mempunyai keahlian dibidan Perl, anda dapat menggunakan Alicia untuk
+     membuat debugging menjadi lebih mudah. Ini merupkan front-end berbasis Perl untuk
+     utilitas crash yang dapat ditemui pada <ulink url="http://alicia.sourceforge.net/"/>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Jika anda lebih memilih Python, maka anda mungkin ingin memasang Pkydump. Paket ini
+     membantu anda mengendalikan GDB melalui skrip Python dan dapat didownload pada
+     <ulink url="http://sf.net/projects/pykdump"/> .
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Sebuah ulasan yang sangat komprehensif mengenai dalaman kernel Linux pada
+     <citetitle>Understanding the Linux Kernel</citetitle> oleh Daniel P.
+     Bovet dan Marco Cesati (ISBN 978-0-596-00565-8).
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+</chapter>

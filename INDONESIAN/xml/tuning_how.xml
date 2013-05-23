@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd">
+<!--
+*********************************
+Please see LICENSE.txt for this document's license.
+*********************************
+-->
+<chapter xml:base="tuning_how.xml" id="cha.tuning.basics">
+
+ <title>Catatan Umum pada Tuning Sistem</title>
+ <abstract>
+  <para>
+   Manual ini mendiskusikan bagaimana untuk mencari sebab untuk permasalahan
+   performa dan menyediakan cara untuk mengatasi masalah tersebut. Sebelum anda
+   memulai tuning sistem anda, anda harus yankin bahwa anda sudah mengetahui
+   masalah umum dan telah menemukan penyebab (bottleneck) untuk masalah. Anda
+   juga harus mempunyai perencanaan mendetail tentang bagaimana melakukan tuning
+   sistem, karena melakukan tuning acak tidak akan membantu (bahkan bisa jadi
+   membuat semakin kacau).
+  </para>
+ </abstract>
+ <procedure>
+  <title>Pendekatan Umum Ketika Tuning Sistem</title>
+  <step performance="required">
+   <para>
+    Yakin tentang masalah yang akan diselesaikan
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Mengetahui masalah umum
+   </para>
+  </step>
+  <step performance="required">
+   <para>
+    Mencari bottleneck
+   </para>
+   <substeps performance="required">
+    <step performance="required">
+     <para>
+      Memonitor sistem dan/atau aplikasi
+     </para>
+    </step>
+    <step performance="required">
+     <para>
+      Menganalisis data
+     </para>
+    </step>
+   </substeps>
+  </step>
+  <step performance="required">
+   <para>
+    Tuning langkah demi langkah
+   </para>
+  </step>
+ </procedure>
+ <sect1 id="sec.tuning.basics.what">
+  <title>Yakinlah Masalah Apa yang Harus Diselesaikan</title>
+
+  <para>
+   Sebelum anda memulai tuning sistem anda, coba deskripsikan masalah
+   sesesuai mungkin. Yang jelas, sebuah pernyataan sederhana <quote>Sistem
+   gue lemod beud!</quote> bukan merupakan deskripsi masalah yang baik.
+   Jika anda berencana melakukan tuning pada Web Server anda agar penyampaian
+   laman statis lebih cepat, misal, hal ini bisa membuat perbedaan apa saja
+   yang harus ditingkatkan secara umum atau khusus.
+  </para>
+
+  <para>
+   Terlebih lagi, anda harus yakin anda dapat menerapkan pengukuran pada masalah
+   anda, jika tidak, anda tidak akan dapat menentukan keberhasilan dari tuning anda.
+   Anda harus selalu bisa membandingkan <quote>sebelum</quote> dan <quote>sesudah</quote>
+  </para>
+ </sect1>
+ <sect1 id="sec.tuning.basics.common">
+  <title>Menentukan Masalah Umum</title>
+
+  <para>
+   Masalah performa sering disebabkan oleh masalah jaringan atau perangkat keras,
+   bug / kutu, atau masalah konfigurasi. Yakinkan anda untuk menentukan masalah
+   umum seperti pada daftar dibawah sebelum melakukan tuning pada sistem anda:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     Periksa <filename>/var/log/warn</filename> dan
+     <filename>/var/log/messages</filename> untuk entri tak biasa.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Periksa (menggunakan <command>top</command> atau <command>ps</command>) apakah 
+     ada proses tertentu yang berkelakuan aneh dengan menggunakan jumlah tak biasa dari CPU time atau memori.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Periksa masalah jaringan dengan memeriksa
+     <filename>/proc/net/dev</filename>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Jika masalah I/O dengan diska fisik, pastikan hal ini tidak disebabkan
+     oleh masalah hardware (periksa diksa dengan <systemitem>smartmontools</systemitems>)
+     atau karena diska yang penuh.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Pastikan job di latar belakang terjadwal agar dilaksanakan saat beban
+     server sedang rendah. Job tersebut juga harus dijalankan dengan prioritar
+     rendah (atur dengan <command>nice</command>).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Jika mesin menjalankan beberapa service menggunakan resource yang sama,
+     pertimbangkan untuk memindahkan service itu ke server lain.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Terakhir, pastikan perangkat lunak anda sudah mutakhir.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <sect1 id="sec.tuning.basics.bottleneck">
+  <title>Mencari Bottleneck</title>
+
+  <para>
+   Mencari bottleneck sangat sering menjadi hal yang paling sulit dalam
+   melakukan tuning pada sebuah sistem. <phrase os="osuse">openSUSE</phrase> menawarkan banyak tools untuk membantu
+   anda atas tugas ini. Lihat <xref linkend="part.tuning.monitoring"/> untuk
+   informasi detail pada aplikasi pengawasan sistem umum dan analisis berkas log.
+   Jika masalah tersebut membutuhkan analisis mendalam dan lama, kernel Linux
+   menawarkan untuk melakukan analisis semacam itu. Lihat
+   <xref linkend="part.tuning.kerneltrace"/> untuk lebih jelas.
+  </para>
+
+  <para>
+   Jika anda sudah mengumpulkan data, sekarang perlu dianalisis. Pertama, periksa
+   apakah perangkat keras server (memori, CPU, bus) dan kapasitas I/O (diska,
+   jaringan) cukup. Jika kondisi dasar ini ditemui, mungkin sistem akan
+   diuntungkan dengan tuning.
+  </para>
+ </sect1>
+ <sect1 id="sec.tuning.basics.tuning">
+  <title>Langkah Langkah Tuning</title>
+
+  <para>
+   Pastikan untuk merencanakan tuning dengan hati-hati. Hal yang sangat penting
+   adalah melakukan satu langkah dalam satu waktu. Hanya dengan melakukan
+   dengan cara ini anda dapat mengukur apakah perubahan yang dibuat merupakan
+   peningkatan atau bahkan mempunyai efek negatif. Tiap aktivitas tuning harus
+   diukur dalam waktu yang cukup untuk memastikan anda dapat melakukan analisis
+   berdasarkan data yang signifikan. Jika anda tidak mendapatkan efek positif,
+   jangan lakukan perubahan permanen. Kemungkinan hal itu bisa menjadi efek
+   negatif di masa yang mendatang.
+  </para>
+ </sect1>
+</chapter>
